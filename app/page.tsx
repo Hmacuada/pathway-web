@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import {
   ArrowRight, Sun, Moon, Shield, BarChart3, Map,
   DollarSign, Globe, Package2, Bot, Check,
-  ChevronRight, Mail, Zap
+  ChevronRight, Mail, Zap, ChevronLeft
 } from "lucide-react";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
@@ -22,6 +22,103 @@ function useTheme() {
     localStorage.setItem("pw-theme", isDark ? "dark" : "light");
   }, [isDark, mounted]);
   return { isDark, toggle: () => setIsDark(d => !d), mounted };
+}
+
+// ── Slides del showcase ───────────────────────────────────────────────────────
+const SLIDES = [
+  {
+    img: "/screenshots/os-desktop.png",
+    label: "Pathway OS",
+    desc: "El escritorio operacional — todas tus apps en un solo entorno",
+  },
+  // Agrega más slides aquí cuando tengas más screenshots:
+  // { img: "/screenshots/control-liquidacion.png", label: "Pathway Control · Liquidación", desc: "..." },
+  // { img: "/screenshots/planificacion-mapa.png",  label: "Pathway Flow · Planificación",  desc: "..." },
+];
+
+// ── Componente Showcase ───────────────────────────────────────────────────────
+function Showcase() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (SLIDES.length <= 1) return;
+    const t = setInterval(() => setActive(i => (i + 1) % SLIDES.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  const slide = SLIDES[active];
+  const prev = () => setActive(i => (i - 1 + SLIDES.length) % SLIDES.length);
+  const next = () => setActive(i => (i + 1) % SLIDES.length);
+
+  return (
+    <section className="px-6 py-16 bg-white dark:bg-slate-950">
+      <div className="max-w-5xl mx-auto">
+
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">
+            El sistema
+          </p>
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
+            Así se ve Pathway OS
+          </h2>
+        </div>
+
+        {/* Frame tipo OS */}
+        <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-2xl shadow-slate-200/60 dark:shadow-slate-950">
+          {/* Barra de título */}
+          <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+            <span className="w-3 h-3 rounded-full bg-red-400" />
+            <span className="w-3 h-3 rounded-full bg-yellow-400" />
+            <span className="w-3 h-3 rounded-full bg-green-400" />
+            <span className="flex-1 text-center text-xs font-medium text-slate-400 dark:text-slate-500">
+              {slide.label}
+            </span>
+          </div>
+
+          {/* Screenshot */}
+          <div className="relative bg-[#1a2744] aspect-[16/9] overflow-hidden">
+            <img
+              key={active}
+              src={slide.img}
+              alt={slide.label}
+              className="w-full h-full object-cover transition-opacity duration-500"
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            />
+            {/* Overlay con descripción */}
+            <div className="absolute bottom-0 left-0 right-0 px-5 py-4"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)" }}>
+              <p className="text-white text-sm font-medium">{slide.desc}</p>
+            </div>
+
+            {/* Flechas (solo si hay más de 1 slide) */}
+            {SLIDES.length > 1 && (
+              <>
+                <button onClick={prev}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all backdrop-blur-sm">
+                  <ChevronLeft size={18} />
+                </button>
+                <button onClick={next}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all backdrop-blur-sm">
+                  <ChevronRight size={18} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Dots */}
+          {SLIDES.length > 1 && (
+            <div className="flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+              {SLIDES.map((_, i) => (
+                <button key={i} onClick={() => setActive(i)}
+                  className={`rounded-full transition-all ${i === active ? "w-5 h-2 bg-blue-600" : "w-2 h-2 bg-slate-300 dark:bg-slate-600"}`} />
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </section>
+  );
 }
 
 // ── Apps del ecosistema (próximas) ────────────────────────────────────────────
@@ -124,6 +221,8 @@ export default function Home() {
             )}
           </div>
         </section>
+
+        <Showcase />
 
         {/* ── Pathway Control — disponible ahora ──────────────────────────── */}
         <section className="px-6 py-16 bg-slate-50 dark:bg-slate-900">
