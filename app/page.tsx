@@ -84,18 +84,17 @@ export default function Home() {
           <div className="relative max-w-3xl mx-auto">
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
-              El sistema operativo<br />
+              Más que software.<br />
               <span style={{
                 background: "linear-gradient(90deg,#2563eb,#7c3aed)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
               }}>
-                de tu operación
+                El núcleo de la logística moderna.
               </span>
             </h1>
 
             <p className="text-xl text-slate-500 dark:text-slate-400 leading-relaxed mb-4 max-w-2xl mx-auto">
-              <strong className="text-slate-700 dark:text-slate-300">Pathway OS</strong> es el entorno donde tu empresa integra todas sus apps operacionales.
-              Un ecosistema construido para operadores logísticos.
+              <strong className="text-slate-700 dark:text-slate-300">Pathway OS</strong> conecta procesos, personas y operaciones en una plataforma inteligente diseñada para empresas que necesitan control en tiempo real.
             </p>
             <p className="text-base text-slate-400 dark:text-slate-500 mb-10">
               Sitio en construcción · Lanzamiento próximamente
