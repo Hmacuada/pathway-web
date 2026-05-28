@@ -188,8 +188,8 @@ export default function Home() {
               {/* Stats */}
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { val: "60%", label: "menos tiempo en liquidación", color: "#7c3aed" },
-                  { val: "0",   label: "errores de pago",              color: "#7c3aed" },
+                  { val: "5 min", label: "para liquidar una ruta completa", color: "#7c3aed" },
+                  { val: "0",    label: "errores de pago",              color: "#7c3aed" },
                   { val: "30d", label: "implementación promedio",      color: "#7c3aed" },
                   { val: "24h", label: "soporte de respuesta",         color: "#7c3aed" },
                 ].map(({ val, label, color }) => (
