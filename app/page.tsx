@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ArrowRight, Sun, Moon, Shield, BarChart3, Map, DollarSign, Globe, Brain, Eye, Package2 } from "lucide-react";
+import { ArrowRight, Sun, Moon, Shield, BarChart3, Map, DollarSign, Globe, Brain, Package2 } from "lucide-react";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 function useTheme() {
@@ -27,7 +27,6 @@ const COMING = [
   { icon: DollarSign,name:"Pathway Control",    tag: "Back-office",  desc: "Liquidación, flota y cobros.",       color: "#7c3aed",  bg: "from-violet-600 to-purple-700" },
   { icon: Brain,    name: "Pathway AI",         tag: "Inteligencia", desc: "Agente operacional con IA.",         color: "#0d9488",  bg: "from-teal-600 to-emerald-600" },
   { icon: Package2, name: "Pathway Supply",      tag: "WMS",          desc: "Compras, inventario y ventas.",      color: "#16a34a",  bg: "from-green-600 to-emerald-600" },
-  { icon: Eye,      name: "Pathway Vision",     tag: "Visibilidad",  desc: "Visibilidad total de la operación.", color: "#d97706",  bg: "from-amber-500 to-orange-600" },
   { icon: BarChart3,name: "Pathway Analytics",  tag: "Datos",        desc: "Reportes y tendencias operativas.", color: "#dc2626",  bg: "from-red-500 to-rose-600" },
 ];
 
