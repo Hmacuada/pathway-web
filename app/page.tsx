@@ -82,11 +82,6 @@ export default function Home() {
           </div>
 
           <div className="relative max-w-3xl mx-auto">
-            {/* Empresa */}
-            <p className="text-xs font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-6">
-              Pathway SpA · Tecnología logística · Chile
-            </p>
-
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
               El sistema operativo<br />
@@ -100,7 +95,7 @@ export default function Home() {
 
             <p className="text-xl text-slate-500 dark:text-slate-400 leading-relaxed mb-4 max-w-2xl mx-auto">
               <strong className="text-slate-700 dark:text-slate-300">Pathway OS</strong> es el entorno donde tu empresa integra todas sus apps operacionales.
-              Un ecosistema construido para operadores logísticos en Chile.
+              Un ecosistema construido para operadores logísticos.
             </p>
             <p className="text-base text-slate-400 dark:text-slate-500 mb-10">
               Sitio en construcción · Lanzamiento próximamente
