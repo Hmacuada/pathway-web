@@ -1,44 +1,91 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
-  Map, DollarSign, Truck, FileSpreadsheet, BarChart3, Package,
-  CheckCircle2, ArrowRight, Menu, X, Mail, Phone, MessageSquare,
-  Shield, Users, Clock, Check, Minus, ChevronRight, ChevronLeft,
-  Sun, Moon, AlertTriangle, Play, Star
+  ArrowRight, Menu, X, Sun, Moon, Shield, ChevronDown,
+  Map, DollarSign, Truck, BarChart3, CheckCircle2,
+  MessageSquare, Mail, Phone, Check, Zap, Globe, Users
 } from "lucide-react";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 function useTheme() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem("pw-theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const dark = saved === "dark" || (!saved && prefersDark);
-    setIsDark(dark);
+    const sys = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setIsDark(saved === "dark" || (!saved && sys));
   }, []);
-
   useEffect(() => {
     if (!mounted) return;
     document.documentElement.classList.toggle("dark", isDark);
     localStorage.setItem("pw-theme", isDark ? "dark" : "light");
   }, [isDark, mounted]);
-
   return { isDark, toggle: () => setIsDark(d => !d) };
 }
 
+// ── Products config ───────────────────────────────────────────────────────────
+const PRODUCTS = [
+  {
+    id: "flow",
+    name: "Pathway Flow",
+    tag: "Planificación",
+    tagline: "Planifica 10 rutas en 15 minutos",
+    desc: "Importa, asigna y exporta tu operación diaria. Reemplaza el Excel de planificación con un sistema visual en tiempo real.",
+    color: "#0891b2",
+    darkColor: "#22d3ee",
+    bg: "from-cyan-500 to-blue-600",
+    lightBg: "#ecfeff",
+    darkBg: "#0c1f2e",
+    href: "/flow",
+    icon: Map,
+    metrics: [{ val: "80%", label: "menos tiempo planificando" }, { val: "100%", label: "visibilidad de rutas" }],
+  },
+  {
+    id: "control",
+    name: "Pathway Control",
+    tag: "Back-office",
+    tagline: "De la entrega al pago, sin planillas",
+    desc: "Liquidación, flota, consultas y prefacturas en un solo lugar. Elimina los errores de pago y gestiona tu flota con trazabilidad total.",
+    color: "#7c3aed",
+    darkColor: "#a78bfa",
+    bg: "from-violet-600 to-purple-700",
+    lightBg: "#f5f3ff",
+    darkBg: "#1a0f2e",
+    href: "/control",
+    icon: DollarSign,
+    metrics: [{ val: "60%", label: "menos tiempo en liquidación" }, { val: "0", label: "errores de pago" }],
+  },
+  {
+    id: "os",
+    name: "Pathway OS",
+    tag: "All-in-one",
+    tagline: "Toda tu operación en un solo lugar",
+    desc: "Flow + Control integrados en una plataforma web y aplicación de escritorio. La experiencia logística completa para tu empresa.",
+    color: "#2563eb",
+    darkColor: "#60a5fa",
+    bg: "from-blue-600 to-indigo-700",
+    lightBg: "#eff6ff",
+    darkBg: "#0d1b3e",
+    href: "/os",
+    icon: Globe,
+    metrics: [{ val: "Web", label: "+ Escritorio" }, { val: "1", label: "plataforma completa" }],
+    featured: true,
+  },
+];
+
 // ── Navbar ────────────────────────────────────────────────────────────────────
-function Navbar({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => void }) {
+function Navbar({ isDark, toggle }: { isDark: boolean; toggle: () => void }) {
   const [open, setOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
+    <nav className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg,#1e3a8a,#2563eb)" }}>
+
+        {/* Logo */}
+        <a href="/" className="flex items-center gap-2.5 shrink-0">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#1e3a8a,#2563eb)" }}>
             <span className="text-white font-black text-sm">P</span>
           </div>
           <span className="font-black text-lg text-slate-900 dark:text-white tracking-tight">
@@ -46,49 +93,83 @@ function Navbar({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => v
           </span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
-          {[["Solución", "#como-funciona"], ["Módulos", "#modulos"], ["Precios", "#precios"], ["Contacto", "#contacto"]].map(([l, h]) => (
-            <a key={l} href={h} className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{l}</a>
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-1">
+          {/* Products dropdown */}
+          <div className="relative" onMouseEnter={() => setDropOpen(true)} onMouseLeave={() => setDropOpen(false)}>
+            <button className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-all">
+              Productos <ChevronDown size={14} className={`transition-transform ${dropOpen ? "rotate-180" : ""}`} />
+            </button>
+            {dropOpen && (
+              <div className="absolute top-full left-0 pt-2 w-72">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
+                  {PRODUCTS.map(p => (
+                    <a key={p.id} href={p.href}
+                      className="flex items-start gap-3 px-4 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group border-b border-slate-100 dark:border-slate-800 last:border-none">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${p.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                        <p.icon size={14} color="white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{p.tagline}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {[["Precios", "#precios"], ["Nosotros", "#nosotros"], ["Contacto", "#contacto"]].map(([l, h]) => (
+            <a key={l} href={h} className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-all">{l}</a>
           ))}
         </div>
 
+        {/* Right actions */}
         <div className="hidden md:flex items-center gap-2">
-          {/* Theme toggle */}
-          <button onClick={toggleTheme}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Cambiar tema">
-            {isDark ? <Sun size={17} /> : <Moon size={17} />}
+          <button onClick={toggle} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           <a href="/portal" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-4 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
             Ingresar
           </a>
           <a href="#contacto" className="text-sm font-bold text-white px-5 py-2 rounded-lg transition-all"
-            style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 2px 12px rgba(37,99,235,0.3)" }}>
-            Solicitar demo
+            style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 2px 12px rgba(37,99,235,0.35)" }}>
+            Demo gratuita
           </a>
         </div>
 
-        <div className="md:hidden flex items-center gap-2">
-          <button onClick={toggleTheme} className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-            {isDark ? <Sun size={17} /> : <Moon size={17} />}
+        {/* Mobile */}
+        <div className="md:hidden flex items-center gap-1">
+          <button onClick={toggle} className="w-9 h-9 flex items-center justify-center text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <button className="text-slate-600 dark:text-slate-300 w-9 h-9 flex items-center justify-center" onClick={() => setOpen(!open)}>
-            {open ? <X size={22} /> : <Menu size={22} />}
+          <button onClick={() => setOpen(!open)} className="w-9 h-9 flex items-center justify-center text-slate-600 dark:text-slate-300">
+            {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-4 space-y-1">
-          {[["Solución", "#como-funciona"], ["Módulos", "#modulos"], ["Precios", "#precios"], ["Contacto", "#contacto"]].map(([l, h]) => (
-            <a key={l} href={h} onClick={() => setOpen(false)}
-              className="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300">{l}</a>
+        <div className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-6 py-4">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Productos</p>
+          {PRODUCTS.map(p => (
+            <a key={p.id} href={p.href} className="flex items-center gap-3 py-2.5">
+              <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${p.bg} flex items-center justify-center shrink-0`}>
+                <p.icon size={13} color="white" />
+              </div>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{p.name}</span>
+            </a>
           ))}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
-            <a href="/portal" className="block text-center py-2.5 text-sm font-semibold text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-xl">Ingresar</a>
-            <a href="#contacto" onClick={() => setOpen(false)}
-              className="block text-center py-2.5 text-sm font-bold text-white rounded-xl"
-              style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)" }}>Solicitar demo</a>
+          <div className="border-t border-slate-100 dark:border-slate-800 mt-3 pt-3 space-y-1">
+            {[["Precios", "#precios"], ["Contacto", "#contacto"]].map(([l, h]) => (
+              <a key={l} href={h} className="block py-2 text-sm text-slate-600 dark:text-slate-300">{l}</a>
+            ))}
+            <a href="#contacto" className="block mt-2 text-center py-2.5 text-sm font-bold text-white rounded-xl"
+              style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)" }}>
+              Demo gratuita
+            </a>
           </div>
         </div>
       )}
@@ -99,458 +180,231 @@ function Navbar({ isDark, toggleTheme }: { isDark: boolean; toggleTheme: () => v
 // ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero() {
   return (
-    <section className="bg-white dark:bg-slate-900 py-16 md:py-24 px-6 overflow-hidden transition-colors duration-300">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 text-blue-700 dark:text-blue-400 text-xs font-bold px-3 py-1.5 rounded-full mb-6">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-            Plataforma Logística 3PL · Chile
-          </div>
+    <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-20 pb-24 px-6 transition-colors duration-300">
+      {/* Subtle background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.06] dark:opacity-[0.1]"
+          style={{ background: "radial-gradient(ellipse, #2563eb 0%, transparent 70%)" }} />
+        <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.025]"
+          style={{ backgroundImage: "linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+      </div>
 
-          <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-6">
-            Digitaliza tu operación logística con una sola plataforma
-          </h1>
-
-          <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-8">
-            Pathway reemplaza tus planillas de Excel por un sistema centralizado de planificación de rutas, liquidación de conductores y gestión de flota. En tiempo real, en la nube.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 mb-10">
-            <a href="#contacto"
-              className="flex items-center justify-center gap-2 text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all"
-              style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 4px 20px rgba(37,99,235,0.35)" }}>
-              Solicitar demo gratuita <ArrowRight size={15} />
-            </a>
-            <a href="#como-funciona"
-              className="flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 font-semibold px-7 py-3.5 rounded-xl text-sm border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-700 dark:hover:text-blue-400 transition-all bg-white dark:bg-slate-800">
-              <Play size={14} className="text-blue-600 dark:text-blue-400" /> Ver cómo funciona
-            </a>
-          </div>
-
-          <div className="flex flex-wrap gap-4 text-xs text-slate-500 dark:text-slate-400">
-            {[[Shield, "Datos seguros en la nube"], [Clock, "Implementación en 30 días"], [Users, "Soporte en español"]].map(([Icon, text]) => (
-              <div key={text as string} className="flex items-center gap-1.5">
-                <Icon size={13} className="text-blue-500" />
-                <span>{text as string}</span>
-              </div>
-            ))}
-          </div>
+      <div className="relative max-w-5xl mx-auto text-center">
+        {/* Eyebrow */}
+        <div className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-8 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900 text-blue-700 dark:text-blue-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+          Tecnología logística para operadores 3PL · Chile
         </div>
 
-        {/* Dashboard mockup */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-3xl opacity-40 dark:opacity-20"
-            style={{ background: "linear-gradient(135deg,#dbeafe,#ede9fe)", filter: "blur(40px)", transform: "scale(0.9)" }} />
-          <div className="relative rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800 shadow-2xl shadow-slate-200 dark:shadow-slate-950">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-              <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-              <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-              <div className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-              <div className="ml-3 flex-1 flex items-center gap-1.5 bg-white dark:bg-slate-800 rounded-md px-3 py-1 border border-slate-200 dark:border-slate-700">
-                <Shield size={9} className="text-green-500" />
-                <span className="text-[10px] text-slate-400">app.pathway.cl</span>
-              </div>
+        {/* Headline */}
+        <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-[1.05] tracking-tight mb-6">
+          El sistema operativo<br />
+          <span className="relative">
+            de tu{" "}
+            <span className="relative inline-block">
+              <span style={{ background: "linear-gradient(90deg,#2563eb,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                logística
+              </span>
+              <svg className="absolute -bottom-1 left-0 w-full" height="6" viewBox="0 0 200 6" preserveAspectRatio="none">
+                <path d="M0,5 Q50,0 100,4 Q150,8 200,3" stroke="url(#g)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+                <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#2563eb"/><stop offset="100%" stopColor="#7c3aed"/></linearGradient></defs>
+              </svg>
+            </span>
+          </span>
+        </h1>
+
+        <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+          Tres soluciones que transforman cómo planificas, controlas y pagas tu operación logística. Sin Excel. Sin errores. En tiempo real.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+          <a href="#contacto" className="flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-sm transition-all"
+            style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 6px 24px rgba(37,99,235,0.4)" }}>
+            Habla con un especialista <ArrowRight size={15} />
+          </a>
+          <a href="#productos" className="flex items-center gap-2 text-slate-600 dark:text-slate-300 font-semibold px-8 py-4 rounded-xl text-sm border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all bg-white dark:bg-slate-900">
+            Ver soluciones
+          </a>
+        </div>
+
+        {/* Impact numbers */}
+        <div className="inline-flex flex-col sm:flex-row items-center gap-6 sm:gap-12 px-8 py-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          {[
+            { val: "80%", label: "menos tiempo planificando" },
+            { val: "60%", label: "menos tiempo liquidando" },
+            { val: "100%", label: "trazabilidad de entregas" },
+          ].map(({ val, label }, i) => (
+            <div key={val} className={`text-center ${i > 0 ? "sm:border-l border-slate-200 dark:border-slate-700 sm:pl-12" : ""}`}>
+              <div className="text-2xl font-black text-slate-900 dark:text-white">{val}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{label}</div>
             </div>
-            <div className="flex" style={{ minHeight: 300 }}>
-              <div className="w-14 border-r border-slate-100 dark:border-slate-700 bg-slate-900 flex flex-col items-center py-4 gap-3">
-                <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
-                  <span className="text-white font-black text-[9px]">P</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Products ──────────────────────────────────────────────────────────────────
+function Products() {
+  return (
+    <section id="productos" className="py-24 px-6 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto">
+
+        <div className="text-center mb-16">
+          <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Nuestras soluciones</p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">
+            Tres productos. Un ecosistema.
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">
+            Adquiere lo que necesitas hoy. Escala cuando lo requieras.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {PRODUCTS.map((p) => (
+            <a key={p.id} href={p.href}
+              className={`group relative rounded-2xl p-8 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border ${
+                p.featured
+                  ? "border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-800 ring-2 ring-blue-600/20 dark:ring-blue-400/20"
+                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-200 dark:hover:border-blue-700"
+              }`}>
+
+              {p.featured && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                    Solución completa
+                  </span>
                 </div>
-                {[BarChart3, Map, DollarSign, Truck, FileSpreadsheet].map((Icon, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-lg flex items-center justify-center ${i === 0 ? "bg-blue-600" : ""}`}>
-                    <Icon size={14} color={i === 0 ? "white" : "#64748b"} />
+              )}
+
+              {/* Icon + tag */}
+              <div className="flex items-start justify-between mb-6">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${p.bg} flex items-center justify-center shadow-lg`}
+                  style={{ boxShadow: `0 8px 20px ${p.color}30` }}>
+                  <p.icon size={22} color="white" strokeWidth={1.8} />
+                </div>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full border"
+                  style={{ color: p.color, borderColor: `${p.color}30`, background: `${p.color}10` }}>
+                  {p.tag}
+                </span>
+              </div>
+
+              {/* Name + tagline */}
+              <h3 className="font-black text-xl text-slate-900 dark:text-white mb-1 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+                {p.name}
+              </h3>
+              <p className="font-semibold text-sm mb-3" style={{ color: p.color }}>{p.tagline}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed flex-1 mb-6">{p.desc}</p>
+
+              {/* Metrics */}
+              <div className="grid grid-cols-2 gap-3 mb-6 pt-5 border-t border-slate-100 dark:border-slate-700">
+                {p.metrics.map(({ val, label }) => (
+                  <div key={label} className="rounded-xl p-3" style={{ background: `${p.color}08` }}>
+                    <div className="font-black text-lg" style={{ color: p.color }}>{val}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">{label}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex-1 p-4 bg-white dark:bg-slate-800">
-                <div className="text-[10px] font-bold text-slate-800 dark:text-slate-200 mb-3">Dashboard · Hoy</div>
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  {[{ l: "Rutas activas", v: "12", c: "#2563eb" }, { l: "Conductores", v: "8", c: "#7c3aed" }, { l: "Liquidación", v: "$842K", c: "#059669" }].map(({ l, v, c }) => (
-                    <div key={l} className="rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                      <div className="text-[8px] text-slate-500 dark:text-slate-400 mb-1">{l}</div>
-                      <div className="font-black text-sm" style={{ color: c }}>{v}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
-                  <div className="bg-slate-50 dark:bg-slate-900 px-3 py-1.5 flex justify-between">
-                    <span className="text-[8px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Rutas del día</span>
-                    <span className="text-[8px] text-blue-600 dark:text-blue-400 font-semibold">Ver todas</span>
-                  </div>
-                  {[{ r: "Ruta Norte", c: "C. Ramírez", e: "En ruta", d: "#22c55e" }, { r: "Ruta Sur", c: "M. González", e: "Completada", d: "#3b82f6" }, { r: "Ruta Centro", c: "P. Soto", e: "Pendiente", d: "#f59e0b" }].map((row, i) => (
-                    <div key={i} className={`flex items-center gap-2 px-3 py-2 ${i < 2 ? "border-b border-slate-50 dark:border-slate-700" : ""}`}>
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: row.d }} />
-                      <span className="text-[9px] font-semibold text-slate-700 dark:text-slate-300 flex-1">{row.r}</span>
-                      <span className="text-[8px] text-slate-400">{row.c}</span>
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ color: row.d, background: `${row.d}18` }}>{row.e}</span>
-                    </div>
-                  ))}
-                </div>
+
+              {/* CTA */}
+              <div className="flex items-center gap-1.5 text-sm font-bold transition-all" style={{ color: p.color }}>
+                Conocer más <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Problem ───────────────────────────────────────────────────────────────────
-function Problem() {
-  return (
-    <section className="py-16 px-6 bg-slate-50 dark:bg-slate-800 transition-colors duration-300">
-      <div className="max-w-5xl mx-auto text-center">
-        <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">El problema que resolvemos</p>
-        <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4 leading-tight">
-          ¿Tu operación logística aún depende<br className="hidden md:block" /> de planillas de Excel?
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto mb-12">
-          Las empresas 3PL pierden horas cada día en tareas manuales que se pueden automatizar.
-        </p>
-        <div className="grid md:grid-cols-3 gap-5 text-left">
-          {[
-            { icon: AlertTriangle, title: "Errores en liquidación", desc: "Fórmulas rotas, versiones distintas del Excel, pagos incorrectos a conductores.", color: "#ef4444" },
-            { icon: Clock, title: "Planificación lenta", desc: "Asignar rutas manualmente toma horas. Sin visibilidad del estado de entrega.", color: "#f59e0b" },
-            { icon: FileSpreadsheet, title: "Sin trazabilidad", desc: "Información dispersa entre WhatsApp, correos y archivos. Imposible auditar.", color: "#8b5cf6" },
-          ].map(({ icon: Icon, title, desc, color }) => (
-            <div key={title} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: `${color}12` }}>
-                <Icon size={20} style={{ color }} />
-              </div>
-              <h3 className="font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
-            </div>
+            </a>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
 
-// ── How It Works — Slides ─────────────────────────────────────────────────────
-const STEPS = [
-  {
-    step: "01", color: "#2563eb",
-    title: "Importa tu data existente",
-    desc: "Sube tu Excel de rutas (formato Rosen, Drivin o nativo) y Pathway mapea las columnas automáticamente. Las direcciones se geocodifican en segundos. Sin redigitar nada.",
-    tags: ["Excel Rosen", "Drivin API", "Formato nativo"],
-    screen: "import",
-  },
-  {
-    step: "02", color: "#7c3aed",
-    title: "Planifica y asigna rutas",
-    desc: "Visualiza todas las entregas del día en el mapa. Asigna conductores, crea rutas por zona y exporta la hoja de trabajo. Lo que antes tomaba 2 horas, ahora toma 15 minutos.",
-    tags: ["Mapa en tiempo real", "Asignación rápida", "Exportar Excel"],
-    screen: "map",
-  },
-  {
-    step: "03", color: "#059669",
-    title: "Liquida automáticamente",
-    desc: "El motor de liquidación calcula el pago de cada conductor: tarifa base, recargos zonales, adicionales y convenios. Sin errores, con trazabilidad completa.",
-    tags: ["Cálculo automático", "Múltiples tarifas", "Prefacturas"],
-    screen: "liquidation",
-  },
-];
-
-function ScreenImport() {
-  return (
-    <div className="p-4 space-y-3">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">Importar archivo</span>
-        <span className="text-[9px] text-blue-600 dark:text-blue-400 font-semibold">PATHWAY Nativo</span>
-      </div>
-      {/* File drop zone */}
-      <div className="border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-xl p-5 text-center bg-blue-50/50 dark:bg-blue-950/30">
-        <FileSpreadsheet size={24} className="mx-auto text-blue-400 mb-2" />
-        <p className="text-[9px] font-semibold text-slate-600 dark:text-slate-300">AGL_Rutas_2026.xlsx</p>
-        <p className="text-[8px] text-slate-400 mt-0.5">144 filas detectadas</p>
-      </div>
-      {/* Column mapper */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
-        <div className="bg-slate-50 dark:bg-slate-900 px-3 py-1.5">
-          <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Mapeo de columnas</span>
-        </div>
-        {[["N°Pedido", "HR", "✓"], ["Cliente", "Razón social", "✓"], ["Dirección", "Dirección", "✓"], ["Conductor", "Conductor", "✓"]].map(([field, col, ok], i) => (
-          <div key={i} className={`flex items-center gap-2 px-3 py-1.5 ${i < 3 ? "border-b border-slate-50 dark:border-slate-700" : ""}`}>
-            <span className="text-[8px] text-slate-500 dark:text-slate-400 w-16">{field}</span>
-            <div className="flex-1 h-4 bg-slate-100 dark:bg-slate-700 rounded text-[7px] flex items-center px-2 text-slate-500 dark:text-slate-400">{col}</div>
-            <span className="text-[9px] text-green-500 font-bold">{ok}</span>
-          </div>
-        ))}
-      </div>
-      <button className="w-full py-2 rounded-lg text-[9px] font-bold text-white" style={{ background: "#2563eb" }}>
-        Importar 144 órdenes
-      </button>
-    </div>
-  );
-}
-
-function ScreenMap() {
-  return (
-    <div className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">Planificación · Hoy</span>
-        <span className="text-[9px] bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-400 font-semibold px-2 py-0.5 rounded-full">24 órdenes</span>
-      </div>
-      {/* Map placeholder */}
-      <div className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700" style={{ height: 110, background: "linear-gradient(135deg,#e0f2fe,#f0fdf4)" }}>
-        <div className="relative w-full h-full dark:opacity-60">
-          {/* Route dots simulation */}
-          {[{ x: 20, y: 30, c: "#2563eb" }, { x: 45, y: 50, c: "#2563eb" }, { x: 65, y: 25, c: "#7c3aed" }, { x: 75, y: 60, c: "#7c3aed" }, { x: 35, y: 70, c: "#059669" }, { x: 55, y: 80, c: "#059669" }].map((p, i) => (
-            <div key={i} className="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm" style={{ left: `${p.x}%`, top: `${p.y}%`, background: p.c }} />
-          ))}
-          <div className="absolute bottom-1 right-2 text-[7px] text-slate-400 font-medium">Mapa interactivo</div>
-        </div>
-      </div>
-      {/* Route assignments */}
-      {[{ name: "Ruta Norte", conductor: "C. Ramírez", stops: 8, color: "#2563eb" }, { name: "Ruta Sur", conductor: "M. González", stops: 6, color: "#7c3aed" }].map((r, i) => (
-        <div key={i} className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-xl px-3 py-2 border border-slate-100 dark:border-slate-700">
-          <div className="w-2 h-6 rounded-full" style={{ background: r.color }} />
-          <div className="flex-1">
-            <p className="text-[9px] font-bold text-slate-700 dark:text-slate-200">{r.name}</p>
-            <p className="text-[8px] text-slate-400">{r.conductor} · {r.stops} paradas</p>
-          </div>
-          <span className="text-[8px] text-blue-600 dark:text-blue-400 font-semibold">Ver</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ScreenLiquidation() {
-  return (
-    <div className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-200">Liquidación · Mayo 2026</span>
-        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">$4.2M total</span>
-      </div>
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-2">
-        {[{ l: "Conductores", v: "13" }, { l: "Guías", v: "227" }, { l: "Promedio", v: "$324K" }].map(({ l, v }) => (
-          <div key={l} className="bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-100 dark:border-slate-700 text-center">
-            <p className="text-[7px] text-slate-400 mb-0.5">{l}</p>
-            <p className="text-[10px] font-black text-slate-800 dark:text-slate-200">{v}</p>
-          </div>
-        ))}
-      </div>
-      {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
-        <div className="bg-slate-50 dark:bg-slate-900 grid grid-cols-4 px-3 py-1.5 gap-2">
-          {["Conductor", "Guías", "Recargos", "Total"].map(h => (
-            <span key={h} className="text-[7px] font-bold text-slate-500 dark:text-slate-400 uppercase">{h}</span>
-          ))}
-        </div>
-        {[["C. Ramírez", "24", "+$18K", "$312K"], ["M. González", "19", "+$12K", "$276K"], ["P. Soto", "21", "+$15K", "$298K"]].map((row, i) => (
-          <div key={i} className={`grid grid-cols-4 gap-2 px-3 py-1.5 ${i < 2 ? "border-b border-slate-50 dark:border-slate-700" : ""}`}>
-            <span className="text-[8px] font-semibold text-slate-700 dark:text-slate-300">{row[0]}</span>
-            <span className="text-[8px] text-slate-500 dark:text-slate-400">{row[1]}</span>
-            <span className="text-[8px] text-emerald-600 dark:text-emerald-400">{row[2]}</span>
-            <span className="text-[8px] font-bold text-slate-800 dark:text-slate-200">{row[3]}</span>
-          </div>
-        ))}
-      </div>
-      <button className="w-full py-2 rounded-lg text-[9px] font-bold text-white" style={{ background: "#059669" }}>
-        Generar prefacturas
-      </button>
-    </div>
-  );
-}
-
-function HowItWorks() {
-  const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-
-  const next = useCallback(() => setActive(a => (a + 1) % STEPS.length), []);
-  const prev = useCallback(() => setActive(a => (a - 1 + STEPS.length) % STEPS.length), []);
-
-  useEffect(() => {
-    if (paused) return;
-    const id = setInterval(next, 4500);
-    return () => clearInterval(id);
-  }, [paused, next]);
-
-  const step = STEPS[active];
-
-  return (
-    <section id="como-funciona" className="py-24 px-6 bg-white dark:bg-slate-900 transition-colors duration-300">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Cómo funciona</p>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">
-            Operativo en 3 pasos simples
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">
-            Sin meses de implementación. Sin consultores externos.
+        {/* Integration note */}
+        <div className="mt-10 text-center">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            ✦ Pathway Flow y Pathway Control se integran nativamente en{" "}
+            <span className="font-bold text-blue-600 dark:text-blue-400">Pathway OS</span>
           </p>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Step tabs */}
-        <div className="flex gap-2 justify-center mb-10">
-          {STEPS.map((s, i) => (
-            <button key={i}
-              onClick={() => { setActive(i); setPaused(true); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${i === active ? "text-white shadow-lg" : "text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"}`}
-              style={i === active ? { background: s.color, boxShadow: `0 4px 16px ${s.color}40` } : {}}>
-              <span className="text-xs opacity-70">{s.step}</span>
-              <span className="hidden sm:inline">{s.title.split(" ").slice(0, 2).join(" ")}</span>
-            </button>
-          ))}
-        </div>
+// ── Why Pathway ───────────────────────────────────────────────────────────────
+function Why() {
+  return (
+    <section id="nosotros" className="py-24 px-6 bg-white dark:bg-slate-950 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
 
-        {/* Slide */}
-        <div className="grid md:grid-cols-2 gap-10 items-center"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}>
-
-          {/* Text side */}
+          {/* Left */}
           <div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="font-black text-5xl" style={{ color: `${step.color}25` }}>{step.step}</span>
-              <div className="h-px flex-1 max-w-xs" style={{ background: `${step.color}30` }} />
+            <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4">Por qué Pathway</p>
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight mb-6">
+              No somos solo un software.<br />Somos tu partner tecnológico.
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-lg leading-relaxed mb-8">
+              Diseñamos Pathway para el mercado logístico chileno. Entendemos cómo
+              operan los 3PL, sus procesos, sus integraciones y sus dolores. Por eso nuestras
+              soluciones se implementan en semanas, no en meses.
+            </p>
+
+            <div className="space-y-4">
+              {[
+                { icon: Zap, title: "Implementación en 30 días", desc: "Operativo y con tu equipo capacitado en menos de un mes." },
+                { icon: Shield, title: "Datos seguros en la nube", desc: "Infraestructura segura con backups automáticos y acceso desde cualquier lugar." },
+                { icon: Users, title: "Soporte en español", desc: "Equipo local que conoce tu operación y responde en horas, no en días." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center shrink-0">
+                    <Icon size={18} className="text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 dark:text-white text-sm">{title}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3">{step.title}</h3>
-            <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-6">{step.desc}</p>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {step.tags.map(t => (
-                <span key={t} className="text-xs font-semibold px-3 py-1.5 rounded-full border"
-                  style={{ color: step.color, borderColor: `${step.color}30`, background: `${step.color}08` }}>{t}</span>
+          </div>
+
+          {/* Right — Visual */}
+          <div className="space-y-4">
+            {/* Big stat */}
+            <div className="rounded-2xl p-8 text-white relative overflow-hidden"
+              style={{ background: "linear-gradient(135deg,#1d4ed8,#4f46e5)" }}>
+              <div className="absolute top-0 right-0 w-40 h-40 opacity-10"
+                style={{ background: "radial-gradient(circle, white, transparent)", transform: "translate(30%,-30%)" }} />
+              <p className="text-sm font-semibold text-blue-200 mb-1">Operadores que ya digitalizaron</p>
+              <p className="text-6xl font-black text-white mb-2">3PL</p>
+              <p className="text-blue-200 text-sm leading-relaxed">
+                Operadores logísticos en Chile confían en Pathway para gestionar
+                sus operaciones diarias.
+              </p>
+            </div>
+
+            {/* Two smaller stats */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { val: "30 días", label: "tiempo promedio de implementación", color: "#0891b2" },
+                { val: "24h", label: "tiempo de respuesta del soporte", color: "#7c3aed" },
+              ].map(({ val, label, color }) => (
+                <div key={val} className="rounded-2xl p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                  <div className="font-black text-2xl mb-1" style={{ color }}>{val}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{label}</div>
+                </div>
               ))}
             </div>
 
-            {/* Navigation */}
-            <div className="flex items-center gap-4">
-              <button onClick={() => { prev(); setPaused(true); }}
-                className="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 transition-all">
-                <ChevronLeft size={16} />
-              </button>
-              <div className="flex gap-1.5">
-                {STEPS.map((_, i) => (
-                  <button key={i} onClick={() => { setActive(i); setPaused(true); }}
-                    className="h-1.5 rounded-full transition-all duration-500"
-                    style={{ width: i === active ? 24 : 6, background: i === active ? step.color : "#cbd5e1" }} />
+            {/* Compatible with */}
+            <div className="rounded-2xl p-5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Compatible con</p>
+              <div className="flex flex-wrap gap-2">
+                {["Excel Rosen", "Drivin API", "Beetrack", "SAP", "Odoo"].map(t => (
+                  <span key={t} className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+                    {t}
+                  </span>
                 ))}
               </div>
-              <button onClick={() => { next(); setPaused(true); }}
-                className="w-9 h-9 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:border-blue-400 hover:text-blue-600 transition-all">
-                <ChevronRight size={16} />
-              </button>
             </div>
           </div>
-
-          {/* Screen mockup */}
-          <div className="relative">
-            <div className="absolute -inset-2 rounded-3xl opacity-20"
-              style={{ background: `radial-gradient(circle, ${step.color}, transparent)`, filter: "blur(30px)" }} />
-            <div className="relative rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800 shadow-xl">
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                <div className="flex gap-1.5">
-                  {["#ff5f57", "#febc2e", "#28c840"].map(c => (
-                    <div key={c} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
-                  ))}
-                </div>
-                <div className="flex-1 mx-3 flex items-center gap-1.5 bg-white dark:bg-slate-800 rounded px-2 py-0.5 border border-slate-200 dark:border-slate-700">
-                  <Shield size={8} className="text-green-500" />
-                  <span className="text-[9px] text-slate-400">app.pathway.cl</span>
-                </div>
-              </div>
-              {step.screen === "import" && <ScreenImport />}
-              {step.screen === "map" && <ScreenMap />}
-              {step.screen === "liquidation" && <ScreenLiquidation />}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Modules ───────────────────────────────────────────────────────────────────
-function Modules() {
-  const MODS = [
-    { icon: Map, color: "#2563eb", title: "Planificación de rutas", desc: "Asignación, agrupación por zona, mapa interactivo y exportación diaria." },
-    { icon: DollarSign, color: "#7c3aed", title: "Liquidación flexible", desc: "Motor configurable: tarifas, recargos, convenios y módulos personalizables." },
-    { icon: Truck, color: "#059669", title: "Gestión de flota", desc: "Vehículos, conductores y documentos con alertas de vencimiento automáticas." },
-    { icon: FileSpreadsheet, color: "#d97706", title: "Importación de datos", desc: "Excel Rosen, Drivin API o formato nativo con mapeo inteligente de columnas." },
-    { icon: BarChart3, color: "#dc2626", title: "Dashboard y reportes", desc: "Métricas en tiempo real, filtros avanzados y exportación a Excel." },
-    { icon: Package, color: "#0891b2", title: "Prefacturas y cobros", desc: "Facturación automática desde liquidaciones, por mandante." },
-  ];
-
-  return (
-    <section id="modulos" className="py-24 px-6 bg-slate-50 dark:bg-slate-800 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-          <div>
-            <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Módulos</p>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight">
-              Una plataforma,<br />toda la operación
-            </h2>
-          </div>
-          <a href="#contacto" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold text-sm hover:gap-3 transition-all">
-            Ver demo completa <ChevronRight size={16} />
-          </a>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {MODS.map(({ icon: Icon, color, title, desc }) => (
-            <div key={title} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-700 hover:shadow-lg transition-all group cursor-default">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}12` }}>
-                  <Icon size={20} style={{ color }} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{title}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Comparison ────────────────────────────────────────────────────────────────
-function Comparison() {
-  const rows: [string, boolean, boolean, boolean | string][] = [
-    ["Planificación de rutas", true, false, "parcial"],
-    ["Liquidación automática", true, false, "parcial"],
-    ["Gestión de flota + documentos", true, false, false],
-    ["Importación Excel / API", true, false, "parcial"],
-    ["Dashboard en tiempo real", true, false, false],
-    ["Soporte en español", true, false, false],
-    ["Implementación en 30 días", true, true, false],
-    ["Sin instalación local", true, true, false],
-  ];
-
-  function Cell({ val }: { val: boolean | string }) {
-    if (val === true) return <Check size={17} className="mx-auto text-blue-600 dark:text-blue-400" strokeWidth={2.5} />;
-    if (val === false) return <Minus size={17} className="mx-auto text-slate-300 dark:text-slate-600" />;
-    return <span className="text-xs text-slate-400 font-medium">Parcial</span>;
-  }
-
-  return (
-    <section className="py-24 px-6 bg-white dark:bg-slate-900 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Comparativa</p>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">Pathway vs otras alternativas</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">Diseñado específicamente para operadores 3PL en Chile.</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg">
-          <div className="grid grid-cols-4 text-sm font-bold">
-            <div className="px-6 py-4 bg-slate-900 dark:bg-slate-800 text-slate-400 font-normal text-xs uppercase tracking-wide">Funcionalidad</div>
-            <div className="px-4 py-4 text-center bg-blue-600 text-white">Pathway</div>
-            <div className="px-4 py-4 text-center bg-slate-900 dark:bg-slate-800 text-slate-300">Excel / Manual</div>
-            <div className="px-4 py-4 text-center bg-slate-900 dark:bg-slate-800 text-slate-300">Software genérico</div>
-          </div>
-          {rows.map(([label, pathway, excel, generic], i) => (
-            <div key={i} className={`grid grid-cols-4 text-sm border-b border-slate-100 dark:border-slate-800 last:border-none ${i % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/50 dark:bg-slate-800/50"}`}>
-              <div className="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium text-sm">{label}</div>
-              <div className="px-4 py-3.5 flex items-center justify-center bg-blue-50/30 dark:bg-blue-950/20"><Cell val={pathway} /></div>
-              <div className="px-4 py-3.5 flex items-center justify-center"><Cell val={excel} /></div>
-              <div className="px-4 py-3.5 flex items-center justify-center"><Cell val={generic} /></div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -560,43 +414,131 @@ function Comparison() {
 // ── Pricing ───────────────────────────────────────────────────────────────────
 function Pricing() {
   const PLANS = [
-    { name: "Starter", highlight: false, desc: "Para operaciones pequeñas que quieren digitalizar.", features: ["Hasta 3 usuarios", "Planificación de rutas", "Importación Excel", "Consultas y reportes", "Soporte por email"], cta: "Contactar" },
-    { name: "Pro", highlight: true, desc: "Para operadores 3PL con múltiples conductores.", features: ["Usuarios ilimitados", "Todo Starter incluido", "Liquidación flexible", "Gestión de flota completa", "Prefacturas y cobros", "Soporte prioritario"], cta: "Solicitar demo" },
-    { name: "Enterprise", highlight: false, desc: "Para grandes operaciones con necesidades específicas.", features: ["Todo Pro incluido", "Multi-empresa", "Integraciones custom", "API acceso completo", "Onboarding dedicado", "SLA garantizado"], cta: "Hablar con ventas" },
+    {
+      product: "Pathway Flow",
+      tag: "Planificación",
+      color: "#0891b2",
+      bg: "from-cyan-500 to-blue-600",
+      desc: "Para equipos que necesitan digitalizar la planificación de rutas.",
+      features: ["Importación Excel / API", "Planificación en mapa", "Asignación de conductores", "Exportación de rutas", "Soporte estándar"],
+    },
+    {
+      product: "Pathway Control",
+      tag: "Back-office",
+      color: "#7c3aed",
+      bg: "from-violet-600 to-purple-700",
+      desc: "Para empresas que quieren automatizar liquidación, flota y cobros.",
+      features: ["Liquidación de conductores", "Gestión de flota y documentos", "Prefacturas por mandante", "Dashboard y consultas", "Soporte prioritario"],
+    },
+    {
+      product: "Pathway OS",
+      tag: "Completo",
+      color: "#2563eb",
+      bg: "from-blue-600 to-indigo-700",
+      desc: "La solución completa: Flow + Control + app de escritorio.",
+      features: ["Todo Flow incluido", "Todo Control incluido", "App de escritorio nativa", "Multi-empresa", "Onboarding dedicado", "SLA garantizado"],
+      featured: true,
+    },
   ];
 
   return (
-    <section id="precios" className="py-24 px-6 bg-slate-50 dark:bg-slate-800 transition-colors duration-300">
+    <section id="precios" className="py-24 px-6 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Precios</p>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">Planes para cada operación</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">Los precios se ajustan al tamaño de tu operación. Consulta sin compromiso.</p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white mb-4">
+            Un plan por cada etapa de tu crecimiento
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 text-lg">Empieza con lo que necesitas. Escala cuando quieras.</p>
         </div>
+
         <div className="grid md:grid-cols-3 gap-5 items-start">
           {PLANS.map((plan) => (
-            <div key={plan.name}
-              className={`rounded-2xl p-7 flex flex-col ${plan.highlight ? "text-white shadow-2xl ring-2 ring-blue-600" : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700"}`}
-              style={plan.highlight ? { background: "linear-gradient(160deg,#1d4ed8,#2563eb 60%,#3b82f6)", transform: "scale(1.03)" } : {}}>
-              {plan.highlight && <div className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-3">⭐ Más popular</div>}
-              <div className="mb-6">
-                <h3 className={`font-black text-xl mb-2 ${plan.highlight ? "text-white" : "text-slate-900 dark:text-white"}`}>{plan.name}</h3>
-                <p className={`text-sm leading-relaxed ${plan.highlight ? "text-blue-200" : "text-slate-500 dark:text-slate-400"}`}>{plan.desc}</p>
+            <div key={plan.product}
+              className={`rounded-2xl p-7 flex flex-col bg-white dark:bg-slate-800 transition-all ${
+                plan.featured
+                  ? "ring-2 ring-blue-600 dark:ring-blue-500 shadow-2xl shadow-blue-100 dark:shadow-blue-950"
+                  : "border border-slate-200 dark:border-slate-700 hover:shadow-lg"
+              }`}
+              style={plan.featured ? { transform: "scale(1.03)" } : {}}>
+
+              {plan.featured && (
+                <div className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: plan.color }}>
+                  ⭐ Recomendado
+                </div>
+              )}
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-5">
+                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${plan.bg} flex items-center justify-center`}>
+                  <span className="text-white text-xs font-black">{plan.product.split(" ")[1][0]}</span>
+                </div>
+                <div>
+                  <p className="font-black text-slate-900 dark:text-white text-sm">{plan.product}</p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ color: plan.color, background: `${plan.color}12` }}>{plan.tag}</span>
+                </div>
               </div>
+
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">{plan.desc}</p>
+
               <ul className="space-y-2.5 flex-1 mb-7">
                 {plan.features.map(f => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm">
-                    <CheckCircle2 size={15} className={`shrink-0 mt-0.5 ${plan.highlight ? "text-blue-200" : "text-blue-500"}`} />
-                    <span className={plan.highlight ? "text-blue-100" : "text-slate-600 dark:text-slate-300"}>{f}</span>
+                  <li key={f} className="flex items-center gap-2.5 text-sm">
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0" style={{ background: `${plan.color}15` }}>
+                      <Check size={10} style={{ color: plan.color }} strokeWidth={3} />
+                    </div>
+                    <span className="text-slate-600 dark:text-slate-300">{f}</span>
                   </li>
                 ))}
               </ul>
+
               <a href="#contacto"
-                className={`text-center text-sm font-bold py-3 rounded-xl transition-all ${plan.highlight ? "bg-white text-blue-700 hover:bg-blue-50" : "border-2 border-slate-900 dark:border-slate-400 text-slate-900 dark:text-slate-200 hover:bg-slate-900 dark:hover:bg-slate-700 hover:text-white"}`}>
-                {plan.cta}
+                className={`text-center text-sm font-bold py-3 rounded-xl transition-all ${
+                  plan.featured
+                    ? "text-white"
+                    : "border-2 text-slate-900 dark:text-white hover:text-white"
+                }`}
+                style={plan.featured
+                  ? { background: `linear-gradient(135deg, ${plan.color}, #4f46e5)`, boxShadow: `0 4px 16px ${plan.color}40` }
+                  : { borderColor: plan.color, color: plan.color }
+                }
+                onMouseEnter={e => { if (!plan.featured) (e.currentTarget as HTMLElement).style.background = plan.color; (e.currentTarget as HTMLElement).style.color = "white"; }}
+                onMouseLeave={e => { if (!plan.featured) { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = plan.color; } }}>
+                Solicitar demo
               </a>
             </div>
           ))}
+        </div>
+
+        <p className="text-center text-sm text-slate-400 dark:text-slate-500 mt-8">
+          Todos los planes incluyen soporte en español, actualizaciones automáticas y acceso web.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ── CTA Band ──────────────────────────────────────────────────────────────────
+function CTABand() {
+  return (
+    <section className="py-20 px-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0f172a 0%,#1e2d5a 50%,#0f172a 100%)" }}>
+      <div className="absolute inset-0 opacity-[0.04]"
+        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)", backgroundSize: "50px 50px" }} />
+      <div className="relative max-w-3xl mx-auto text-center">
+        <h2 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
+          ¿Listo para digitalizar<br />tu operación logística?
+        </h2>
+        <p className="text-slate-400 text-lg mb-8">
+          Habla con un especialista y descubre qué solución se adapta a tu empresa.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#contacto" className="flex items-center gap-2 font-bold px-8 py-4 rounded-xl text-sm text-white transition-all"
+            style={{ background: "linear-gradient(135deg,#2563eb,#4f46e5)", boxShadow: "0 6px 24px rgba(37,99,235,0.4)" }}>
+            Solicitar demo gratuita <ArrowRight size={15} />
+          </a>
+          <a href="/portal" className="flex items-center gap-2 font-semibold px-8 py-4 rounded-xl text-sm border border-slate-600 text-slate-300 hover:border-slate-400 hover:text-white transition-all">
+            Acceder al sistema
+          </a>
         </div>
       </div>
     </section>
@@ -606,59 +548,55 @@ function Pricing() {
 // ── Contact ───────────────────────────────────────────────────────────────────
 function Contact() {
   const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({ nombre: "", empresa: "", email: "", telefono: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", empresa: "", email: "", telefono: "", producto: "", mensaje: "" });
 
   return (
-    <section id="contacto" className="py-24 px-6 bg-white dark:bg-slate-900 transition-colors duration-300">
+    <section id="contacto" className="py-24 px-6 bg-white dark:bg-slate-950 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-5 gap-16 items-start">
           <div className="md:col-span-2">
             <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4">Contacto</p>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-5 leading-tight">Agenda una demo gratuita</h2>
-            <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-8 text-sm">Muéstranos tu operación y te mostramos cómo Pathway la digitaliza. Sin compromiso, sin contratos.</p>
-            <div className="space-y-5 mb-8">
-              {[[Mail, "Email", "hola@pathway.cl"], [Phone, "Teléfono", "+56 9 XXXX XXXX"]].map(([Icon, label, val]) => (
-                <div key={label as string} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center shrink-0">
-                    <Icon size={16} className="text-blue-600 dark:text-blue-400" />
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-5 leading-tight">Hablemos de tu operación</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">
+              Cuéntanos cómo opera tu empresa y te mostramos la solución que mejor se adapta a tus necesidades.
+            </p>
+            <div className="space-y-4 mb-8">
+              {[[Mail, "hola@pathway.cl"], [Phone, "+56 9 XXXX XXXX"]].map(([Icon, val]) => (
+                <div key={val as string} className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center shrink-0">
+                    <Icon size={15} className="text-blue-600 dark:text-blue-400" />
                   </div>
-                  <div>
-                    <div className="text-xs text-slate-400">{label as string}</div>
-                    <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">{val as string}</div>
-                  </div>
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{val as string}</span>
                 </div>
               ))}
             </div>
-            <div className="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-2.5">
-              {["Demo en 30 minutos", "Respuesta en menos de 24h", "Soporte en español"].map(t => (
-                <div key={t} className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                  <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                    <Check size={10} color="white" strokeWidth={3} />
-                  </div>
-                  {t}
+            <div className="space-y-2">
+              {["Demo personalizada en 30 min", "Sin compromiso ni contratos", "Respuesta en menos de 24h"].map(t => (
+                <div key={t} className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                  <CheckCircle2 size={14} className="text-blue-500 shrink-0" /> {t}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="md:col-span-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-xl shadow-slate-100 dark:shadow-slate-950/50">
+          <div className="md:col-span-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-xl shadow-slate-100 dark:shadow-slate-950/50">
             {sent ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-50 dark:bg-green-950 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 size={30} className="text-green-500" />
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-950 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                  <CheckCircle2 size={30} className="text-blue-600" />
                 </div>
-                <h3 className="font-black text-slate-900 dark:text-white text-xl mb-2">¡Mensaje enviado!</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Te contactaremos en menos de 24 horas hábiles.</p>
+                <h3 className="font-black text-slate-900 dark:text-white text-xl mb-2">¡Gracias por contactarnos!</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Un especialista te escribirá en menos de 24 horas hábiles.</p>
               </div>
             ) : (
               <form onSubmit={e => { e.preventDefault(); setSent(true); }} className="space-y-4">
-                <h3 className="font-black text-slate-900 dark:text-white text-xl mb-5">Solicitar demo</h3>
+                <h3 className="font-black text-slate-900 dark:text-white text-lg mb-5">Solicitar demo gratuita</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {[{ name: "nombre", label: "Nombre *", ph: "Tu nombre" }, { name: "empresa", label: "Empresa *", ph: "Nombre empresa" }].map(({ name, label, ph }) => (
-                    <div key={name}>
-                      <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">{label}</label>
-                      <input type="text" placeholder={ph} required value={form[name as keyof typeof form]} onChange={e => setForm({ ...form, [name]: e.target.value })}
-                        className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                  {[{ n: "nombre", l: "Nombre *", p: "Tu nombre" }, { n: "empresa", l: "Empresa *", p: "Nombre empresa" }].map(({ n, l, p }) => (
+                    <div key={n}>
+                      <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">{l}</label>
+                      <input type="text" placeholder={p} required value={form[n as keyof typeof form]} onChange={e => setForm({ ...form, [n]: e.target.value })}
+                        className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
                     </div>
                   ))}
                 </div>
@@ -666,24 +604,34 @@ function Contact() {
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Email *</label>
                     <input type="email" placeholder="tu@empresa.cl" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                      className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                      className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Teléfono</label>
                     <input type="tel" placeholder="+56 9 XXXX XXXX" value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })}
-                      className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+                      className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">¿Cuéntanos tu operación?</label>
-                  <textarea rows={3} placeholder="¿Cuántos conductores? ¿Qué usas ahora? ..." value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none" />
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">¿Qué solución te interesa?</label>
+                  <select value={form.producto} onChange={e => setForm({ ...form, producto: e.target.value })}
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    <option value="">Seleccionar...</option>
+                    <option>Pathway Flow</option>
+                    <option>Pathway Control</option>
+                    <option>Pathway OS</option>
+                    <option>No sé aún, quiero asesoría</option>
+                  </select>
                 </div>
-                <button type="submit" className="w-full text-white font-bold py-3.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5">Cuéntanos tu operación</label>
+                  <textarea rows={3} placeholder="¿Cuántos conductores? ¿Qué usas hoy? ..." value={form.mensaje} onChange={e => setForm({ ...form, mensaje: e.target.value })}
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" />
+                </div>
+                <button type="submit" className="w-full text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2"
                   style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 4px 16px rgba(37,99,235,0.3)" }}>
                   <MessageSquare size={15} /> Solicitar demo gratuita
                 </button>
-                <p className="text-center text-xs text-slate-400">Sin compromiso · Respuesta en 24h hábiles</p>
               </form>
             )}
           </div>
@@ -696,38 +644,52 @@ function Contact() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="bg-slate-950 dark:bg-black py-14 px-6 text-slate-500 transition-colors duration-300">
+    <footer className="bg-slate-950 py-16 px-6 text-slate-500 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-10 mb-12">
+        <div className="grid md:grid-cols-5 gap-10 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#1e3a8a,#2563eb)" }}>
                 <span className="text-white font-black text-xs">P</span>
               </div>
-              <span className="font-black text-white text-base tracking-tight">PATH<span className="text-blue-400">WAY</span></span>
+              <span className="font-black text-white text-base">PATH<span className="text-blue-400">WAY</span></span>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs">Plataforma logística para operadores 3PL en Chile.</p>
-            <div className="flex items-center gap-2 mt-5 text-xs text-slate-600">
-              <Shield size={11} /> Datos alojados en servidores seguros
+            <p className="text-sm leading-relaxed max-w-xs mb-5">
+              El sistema operativo de tu logística. Tecnología diseñada para operadores 3PL en Chile.
+            </p>
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <Shield size={11} /> Infraestructura segura · Chile
             </div>
           </div>
+
           <div>
-            <p className="text-white font-bold text-sm mb-4">Plataforma</p>
+            <p className="text-white font-bold text-sm mb-4">Productos</p>
             <ul className="space-y-2.5 text-sm">
-              {[["Cómo funciona", "#como-funciona"], ["Módulos", "#modulos"], ["Precios", "#precios"], ["Portal cliente", "/portal"]].map(([l, h]) => (
+              {[["Pathway Flow", "/flow"], ["Pathway Control", "/control"], ["Pathway OS", "/os"]].map(([l, h]) => (
                 <li key={l}><a href={h} className="hover:text-white transition-colors">{l}</a></li>
               ))}
             </ul>
           </div>
+
           <div>
             <p className="text-white font-bold text-sm mb-4">Empresa</p>
             <ul className="space-y-2.5 text-sm">
-              {[["Contacto", "#contacto"], ["Demo gratuita", "#contacto"], ["hola@pathway.cl", "mailto:hola@pathway.cl"]].map(([l, h]) => (
+              {[["Nosotros", "#nosotros"], ["Precios", "#precios"], ["Contacto", "#contacto"]].map(([l, h]) => (
+                <li key={l}><a href={h} className="hover:text-white transition-colors">{l}</a></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-white font-bold text-sm mb-4">Acceso</p>
+            <ul className="space-y-2.5 text-sm">
+              {[["Portal clientes", "/portal"], ["hola@pathway.cl", "mailto:hola@pathway.cl"]].map(([l, h]) => (
                 <li key={l}><a href={h} className="hover:text-white transition-colors">{l}</a></li>
               ))}
             </ul>
           </div>
         </div>
+
         <div className="border-t border-slate-900 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
           <span>© {new Date().getFullYear()} Pathway · Bigticket Logística SPA · Chile</span>
           <span className="text-slate-700">Todos los derechos reservados</span>
@@ -740,16 +702,14 @@ function Footer() {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const { isDark, toggle } = useTheme();
-
   return (
     <>
-      <Navbar isDark={isDark} toggleTheme={toggle} />
+      <Navbar isDark={isDark} toggle={toggle} />
       <main className="flex-1">
         <Hero />
-        <Problem />
-        <HowItWorks />
-        <Modules />
-        <Comparison />
+        <Products />
+        <Why />
+        <CTABand />
         <Pricing />
         <Contact />
       </main>
