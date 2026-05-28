@@ -190,7 +190,7 @@ export default function Home() {
                 {[
                   { val: "5 min", label: "para liquidar una ruta completa", color: "#7c3aed" },
                   { val: "0",    label: "errores de pago",              color: "#7c3aed" },
-                  { val: "30d", label: "implementación promedio",      color: "#7c3aed" },
+                  { val: "2 sem", label: "implementación promedio",    color: "#7c3aed" },
                   { val: "24h", label: "soporte de respuesta",         color: "#7c3aed" },
                 ].map(({ val, label, color }) => (
                   <div key={label} className="rounded-2xl p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
