@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import {
   ArrowRight, Sun, Moon, Shield, BarChart3, Map,
   DollarSign, Globe, Package2, Bot, Check,
-  ChevronRight, Mail, Zap, Calendar,
+  ChevronRight, Mail, Zap, Calendar, FileX, Clock, Layers,
 } from "lucide-react";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
@@ -69,15 +69,45 @@ const ROADMAP = [
 ];
 
 const STATUS_STYLES = {
-  disponible: { label: "Disponible",  pill: "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400" },
+  disponible: { label: "Disponible",   pill: "bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400" },
   pronto:     { label: "Próximamente", pill: "bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-400" },
   roadmap:    { label: "Roadmap",      pill: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400" },
 };
 
+const PILLARS = [
+  {
+    icon: FileX,
+    title: "Sin planillas Excel",
+    desc: "Elimina el back-office manual de una vez por todas. Todo automatizado, todo trazable.",
+  },
+  {
+    icon: Clock,
+    title: "Operativo en 2 semanas",
+    desc: "Implementación asistida. En 14 días tu equipo ya gestiona su operación con Control.",
+  },
+  {
+    icon: Layers,
+    title: "Todo en un solo lugar",
+    desc: "Liquidaciones, flota, prefacturas y consultas — integrados, sin cambiar de sistema.",
+  },
+];
+
 export default function HomeV2() {
   const { isDark, toggle, mounted } = useTheme();
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [heroSent, setHeroSent] = useState(false);
+  const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" });
+  const [formSent, setFormSent] = useState(false);
+
+  function handleContact(e: React.FormEvent) {
+    e.preventDefault();
+    const { nombre, email: mail, mensaje } = form;
+    if (!nombre || !mail) return;
+    const subject = encodeURIComponent(`Demo Pathway Control — ${nombre}`);
+    const body = encodeURIComponent(`Nombre: ${nombre}\nEmail: ${mail}\n\n${mensaje}`);
+    window.open(`mailto:hola@pathway.cl?subject=${subject}&body=${body}`, "_blank");
+    setFormSent(true);
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 flex flex-col">
@@ -116,20 +146,29 @@ export default function HomeV2() {
       <main className="flex-1">
 
         {/* ── Hero ──────────────────────────────────────────────────────────── */}
-        <section className="relative overflow-hidden px-6 pt-16 pb-20 text-center">
+        <section className="relative overflow-hidden px-6 pt-14 pb-20 text-center">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] opacity-[0.06] dark:opacity-[0.1]"
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] opacity-[0.06] dark:opacity-[0.10]"
               style={{ background: "radial-gradient(ellipse, #2563eb 0%, transparent 70%)" }} />
             <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.02]"
               style={{ backgroundImage: "linear-gradient(#334155 1px,transparent 1px),linear-gradient(90deg,#334155 1px,transparent 1px)", backgroundSize: "60px 60px" }} />
           </div>
 
           <div className="relative max-w-3xl mx-auto">
+
+            {/* Pill badge */}
+            <a href="#control"
+              className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-xs font-bold hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Pathway Control ya disponible
+              <ChevronRight size={12} />
+            </a>
+
             <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
               Más que software.<br />
               <span style={{
                 background: "linear-gradient(90deg,#2563eb,#7c3aed)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
               }}>
                 El núcleo de la logística moderna.
               </span>
@@ -139,9 +178,9 @@ export default function HomeV2() {
               <strong className="text-slate-700 dark:text-slate-300">Pathway OS</strong> conecta procesos, personas y operaciones en una plataforma inteligente diseñada para empresas que necesitan control en tiempo real.
             </p>
 
-            {/* Email capture — CAMBIO: CTA "Solicitar acceso" */}
-            {!sent ? (
-              <form onSubmit={e => { e.preventDefault(); if (email) setSent(true); }}
+            {/* Email capture */}
+            {!heroSent ? (
+              <form onSubmit={e => { e.preventDefault(); if (email) setHeroSent(true); }}
                 className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input type="email" required placeholder="tu@empresa.cl" value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -163,8 +202,26 @@ export default function HomeV2() {
           </div>
         </section>
 
+        {/* ── Por qué Pathway — franja de confianza ───────────────────────── */}
+        <section className="px-6 py-12 border-y border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8">
+            {PILLARS.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "linear-gradient(135deg,#1d4ed8,#4f46e5)" }}>
+                  <Icon size={18} color="white" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white text-sm mb-1">{title}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ── Pathway Control — disponible ahora ──────────────────────────── */}
-        <section className="px-6 py-16 bg-slate-50 dark:bg-slate-900">
+        <section id="control" className="px-6 py-16 bg-white dark:bg-slate-950">
           <div className="max-w-5xl mx-auto">
 
             <div className="flex items-center justify-center gap-2 mb-10">
@@ -175,7 +232,6 @@ export default function HomeV2() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Info */}
               <div>
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
@@ -218,16 +274,15 @@ export default function HomeV2() {
                 </a>
               </div>
 
-              {/* Stats */}
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { val: "5 min",  label: "para liquidar una ruta completa", color: "#7c3aed" },
-                  { val: "0",      label: "errores de pago",                  color: "#7c3aed" },
-                  { val: "2 sem",  label: "implementación promedio",          color: "#7c3aed" },
-                  { val: "24h",    label: "soporte de respuesta",             color: "#7c3aed" },
-                ].map(({ val, label, color }) => (
-                  <div key={label} className="rounded-2xl p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                    <div className="font-black text-3xl mb-1" style={{ color }}>{val}</div>
+                  { val: "5 min",  label: "para liquidar una ruta completa" },
+                  { val: "0",      label: "errores de pago"                  },
+                  { val: "2 sem",  label: "implementación promedio"          },
+                  { val: "24h",    label: "soporte de respuesta"             },
+                ].map(({ val, label }) => (
+                  <div key={label} className="rounded-2xl p-6 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
+                    <div className="font-black text-3xl mb-1" style={{ color: "#7c3aed" }}>{val}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{label}</div>
                   </div>
                 ))}
@@ -244,7 +299,6 @@ export default function HomeV2() {
 
           <div className="relative max-w-5xl mx-auto">
             <div className="grid md:grid-cols-2 gap-10 items-center">
-              {/* Visual */}
               <div className="flex justify-center">
                 <div className="relative">
                   <div className="w-40 h-40 rounded-3xl flex items-center justify-center"
@@ -262,13 +316,13 @@ export default function HomeV2() {
                 </div>
               </div>
 
-              {/* Info */}
               <div>
                 <p className="text-xs font-bold text-teal-400 uppercase tracking-widest mb-3">Agente de operaciones</p>
                 <h2 className="text-4xl font-black text-white mb-4">
-                  Conoce a <span style={{
+                  Conoce a{" "}
+                  <span style={{
                     background: "linear-gradient(90deg,#2dd4bf,#38bdf8)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text"
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                   }}>RO</span>
                 </h2>
                 <p className="text-slate-400 text-lg leading-relaxed mb-6">
@@ -301,10 +355,8 @@ export default function HomeV2() {
         </section>
 
         {/* ── Pathway OS — Roadmap ─────────────────────────────────────────── */}
-        {/* CAMBIO: De descripción genérica a tabla de roadmap con fechas */}
         <section className="px-6 py-16 bg-white dark:bg-slate-950">
           <div className="max-w-3xl mx-auto">
-
             <div className="text-center mb-10">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6"
                 style={{ background: "linear-gradient(135deg,#1d4ed8,#4f46e5)", boxShadow: "0 8px 24px rgba(37,99,235,0.3)" }}>
@@ -317,25 +369,19 @@ export default function HomeV2() {
               </p>
             </div>
 
-            {/* Tabla de roadmap */}
             <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
               {ROADMAP.map(app => {
                 const s = STATUS_STYLES[app.status as keyof typeof STATUS_STYLES];
                 return (
                   <div key={app.name}
                     className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                    {/* Ícono */}
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br ${app.bg}`}>
                       <app.icon size={18} color="white" strokeWidth={1.8} />
                     </div>
-
-                    {/* Texto */}
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-slate-900 dark:text-white text-sm">{app.name}</div>
                       <div className="text-xs text-slate-500 dark:text-slate-400 truncate">{app.desc}</div>
                     </div>
-
-                    {/* Estado + fecha */}
                     <div className="flex items-center gap-2 shrink-0">
                       {app.eta && (
                         <span className="hidden sm:flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
@@ -351,29 +397,69 @@ export default function HomeV2() {
                 );
               })}
             </div>
-
           </div>
         </section>
 
         {/* ── Contacto ────────────────────────────────────────────────────── */}
         <section id="contacto" className="px-6 py-16 bg-slate-50 dark:bg-slate-900">
-          <div className="max-w-xl mx-auto text-center">
-            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Contacto</p>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Hablemos de tu operación</h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-8">
-              Cuéntanos cómo operas y te mostramos lo que Pathway Control puede hacer por ti.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="mailto:hola@pathway.cl"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold text-white"
-                style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 6px 20px rgba(37,99,235,0.3)" }}>
-                <Mail size={15} /> hola@pathway.cl
-              </a>
-              <a href="https://wa.me/56900000000" target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-blue-700 transition-all bg-white dark:bg-slate-800">
-                WhatsApp
-              </a>
+          <div className="max-w-lg mx-auto">
+            <div className="text-center mb-8">
+              <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Contacto</p>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Hablemos de tu operación</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Cuéntanos cómo operas y te mostramos lo que Pathway Control puede hacer por ti.
+              </p>
             </div>
+
+            {!formSent ? (
+              <form onSubmit={handleContact} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nombre</label>
+                    <input
+                      type="text" required placeholder="Tu nombre"
+                      value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Email</label>
+                    <input
+                      type="email" required placeholder="tu@empresa.cl"
+                      value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">¿Cómo opera tu empresa? <span className="text-slate-400 font-normal">(opcional)</span></label>
+                  <textarea
+                    rows={3} placeholder="Cuéntanos cuántas rutas gestionas, cuántos conductores, qué sistema usas hoy..."
+                    value={form.mensaje} onChange={e => setForm(f => ({ ...f, mensaje: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none"
+                  />
+                </div>
+                <button type="submit"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold text-white transition-all"
+                  style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)", boxShadow: "0 6px 20px rgba(37,99,235,0.3)" }}>
+                  <Mail size={15} /> Enviar mensaje
+                </button>
+                <p className="text-center text-xs text-slate-400 dark:text-slate-500">
+                  O escríbenos directo a{" "}
+                  <a href="mailto:hola@pathway.cl" className="text-blue-500 hover:underline">hola@pathway.cl</a>
+                </p>
+              </form>
+            ) : (
+              <div className="text-center py-10">
+                <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mx-auto mb-4">
+                  <Check size={24} className="text-blue-600 dark:text-blue-400" strokeWidth={2.5} />
+                </div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2">¡Mensaje enviado!</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Te respondemos en menos de 24 horas hábiles.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -386,9 +472,9 @@ export default function HomeV2() {
             <Shield size={11} />
             © {new Date().getFullYear()} Pathway SpA · Chile
           </div>
-          <div className="flex items-center gap-4">
-            <a href="mailto:hola@pathway.cl" className="hover:text-blue-500 transition-colors">hola@pathway.cl</a>
-          </div>
+          <a href="mailto:hola@pathway.cl" className="hover:text-blue-500 transition-colors">
+            hola@pathway.cl
+          </a>
         </div>
       </footer>
 
