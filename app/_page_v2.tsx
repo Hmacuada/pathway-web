@@ -135,6 +135,10 @@ export default function HomeV2() {
             className="hidden sm:block text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             hola@pathway.cl
           </a>
+          <a href="https://pathway-production-0a4d.up.railway.app"
+            className="hidden sm:block text-sm font-semibold text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 transition-all">
+            Ingresar
+          </a>
           <a href="#contacto"
             className="text-sm font-bold text-white px-4 py-2 rounded-lg transition-all"
             style={{ background: "linear-gradient(135deg,#1d4ed8,#2563eb)" }}>
