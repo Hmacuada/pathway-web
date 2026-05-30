@@ -160,14 +160,6 @@ export default function HomeV2() {
 
           <div className="relative max-w-3xl mx-auto">
 
-            {/* Pill badge */}
-            <a href="#control"
-              className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 text-xs font-bold hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Pathway Control ya disponible
-              <ChevronRight size={12} />
-            </a>
-
             <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
               Más que software.<br />
               <span style={{
@@ -221,6 +213,73 @@ export default function HomeV2() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ── Integraciones ───────────────────────────────────────────────── */}
+        <section className="px-6 py-14 bg-white dark:bg-slate-950">
+          <div className="max-w-5xl mx-auto text-center">
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">
+              Se integra con las apps que ya usas
+            </p>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3">
+              Pathway se conecta a tu ecosistema
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl mx-auto mb-10">
+              No es necesario cambiar tus herramientas actuales. Pathway se integra con los principales sistemas de logística, transporte y ERP del mercado.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {/* SAP */}
+              <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#0070F2" }}>
+                  <span className="text-white font-black text-xs">SAP</span>
+                </div>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">SAP</span>
+              </div>
+
+              {/* DRIVIN */}
+              <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#00b4d8,#0077b6)" }}>
+                  <Map size={15} color="white" strokeWidth={2} />
+                </div>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">DRIVIN</span>
+              </div>
+
+              {/* BETRACK */}
+              <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#f97316,#ea580c)" }}>
+                  <Zap size={15} color="white" strokeWidth={2} />
+                </div>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">BETRACK</span>
+              </div>
+
+              {/* DISPATCHTRACK */}
+              <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#7c3aed,#6d28d9)" }}>
+                  <Package2 size={15} color="white" strokeWidth={2} />
+                </div>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">DISPATCHTRACK</span>
+              </div>
+
+              {/* Oracle */}
+              <div className="flex items-center gap-2.5 px-5 py-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-sm transition-all">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#C74634" }}>
+                  <span className="text-white font-black text-[10px] leading-none">ORA</span>
+                </div>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">Oracle</span>
+              </div>
+
+              {/* + más */}
+              <div className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 text-sm font-semibold">
+                <span className="text-xl leading-none">+</span>
+                <span>más sistemas</span>
+              </div>
+            </div>
+
+            <p className="mt-8 text-xs text-slate-400 dark:text-slate-600">
+              ¿Usas otro sistema? <a href="#contacto" className="text-blue-500 hover:underline">Cuéntanos</a> y lo evaluamos.
+            </p>
           </div>
         </section>
 
@@ -470,15 +529,19 @@ export default function HomeV2() {
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-100 dark:border-slate-800 px-6 py-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 dark:text-slate-600">
+      <footer className="border-t border-slate-100 dark:border-slate-800 px-6 py-8">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 dark:text-slate-600">
           <div className="flex items-center gap-1.5">
             <Shield size={11} />
             © {new Date().getFullYear()} Pathway SpA · Chile
           </div>
-          <a href="mailto:hola@pathway.cl" className="hover:text-blue-500 transition-colors">
-            hola@pathway.cl
-          </a>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            <a href="/privacidad" className="hover:text-blue-500 transition-colors">Política de privacidad</a>
+            <span className="hidden sm:inline text-slate-200 dark:text-slate-800">·</span>
+            <a href="/terminos" className="hover:text-blue-500 transition-colors">Términos de uso</a>
+            <span className="hidden sm:inline text-slate-200 dark:text-slate-800">·</span>
+            <a href="mailto:hola@pathway.cl" className="hover:text-blue-500 transition-colors">hola@pathway.cl</a>
+          </div>
         </div>
       </footer>
 
