@@ -40,7 +40,7 @@ const ROADMAP = [
     desc: "Agente de IA que monitorea, analiza e interviene en tu operación",
     bg: "from-teal-500 to-cyan-600",
     status: "pronto",
-    eta: "Q3 2025",
+    eta: "Q3 2026",
   },
   {
     icon: Map,
@@ -48,7 +48,7 @@ const ROADMAP = [
     desc: "Planificación de rutas y despacho inteligente",
     bg: "from-cyan-500 to-blue-600",
     status: "roadmap",
-    eta: "Q4 2025",
+    eta: "Q4 2026",
   },
   {
     icon: Package2,
@@ -56,7 +56,7 @@ const ROADMAP = [
     desc: "Compras, inventario y ventas con trazabilidad completa",
     bg: "from-green-600 to-emerald-600",
     status: "roadmap",
-    eta: "2026",
+    eta: "H1 2027",
   },
   {
     icon: BarChart3,
@@ -64,7 +64,7 @@ const ROADMAP = [
     desc: "Reportes, tendencias y KPIs operativos consolidados",
     bg: "from-red-500 to-rose-600",
     status: "roadmap",
-    eta: "2026",
+    eta: "2027",
   },
 ];
 
