@@ -3,7 +3,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "./_components/site-header";
 import { SiteFooter } from "./_components/site-footer";
-import { EMAIL, SHOW_CLIENTS, WHATSAPP, demoLink } from "./_components/site";
+import { EMAIL, SHOW_CLIENTS, WHATSAPP, demoLink, whatsappLink } from "./_components/site";
 
 // ── Contenido ────────────────────────────────────────────────────────────────
 // Solo se describe lo que hoy existe. Lo que está en desarrollo se dice como tal.
@@ -289,7 +289,7 @@ export default function Home() {
               </a>
               {WHATSAPP && (
                 <a
-                  href={`https://wa.me/${WHATSAPP}`}
+                  href={whatsappLink()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-6 py-3.5 text-sm font-bold text-ink hover:border-ink-2"

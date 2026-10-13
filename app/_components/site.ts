@@ -5,7 +5,12 @@ export const APP_URL = "https://app.pathway.cl";
 
 // Número real en formato internacional sin "+" ni espacios (ej. "56912345678").
 // Mientras esté vacío, el botón de WhatsApp no se muestra.
-export const WHATSAPP = "";
+export const WHATSAPP = "56966474551";
+
+export function whatsappLink() {
+  const text = encodeURIComponent("Hola, quiero ver una demo de Pathway.");
+  return `https://wa.me/${WHATSAPP}?text=${text}`;
+}
 
 // Cambiar a true cuando haya clientes que autoricen mostrar su nombre y logo.
 export const SHOW_CLIENTS = false;
