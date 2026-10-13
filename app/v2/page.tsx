@@ -1,1 +1,6 @@
-export { default } from "../_page_v2";
+import { redirect } from "next/navigation";
+
+// Borrador antiguo del sitio: ya no existe, se envía a la portada.
+export default function V2() {
+  redirect("/");
+}
