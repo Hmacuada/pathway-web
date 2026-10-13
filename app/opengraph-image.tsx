@@ -14,9 +14,9 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#fbf9f4",
+          background: "linear-gradient(135deg, #ffffff 0%, #eaf0ff 100%)",
           padding: "72px 84px",
-          color: "#0e2740",
+          color: "#0f1b33",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>

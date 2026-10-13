@@ -1,14 +1,19 @@
 @import "tailwindcss";
 
-/* Paleta de marca: la misma de la portada de las propuestas (azul tinta + ámbar sobre papel) */
+/* Paleta clara: fondo blanco, azul de marca y ámbar para Bodega */
 @theme inline {
-  --color-ink: #0e2740;
-  --color-ink-2: #3b5572;
-  --color-muted: #566478;
-  --color-paper: #fbf9f4;
-  --color-paper-2: #f3efe6;
-  --color-line: #e4dfd3;
-  --color-amber: #e3a035;
+  --color-ink: #0f1b33;
+  --color-ink-2: #3c4a66;
+  --color-muted: #5b6b86;
+  --color-paper: #ffffff;
+  --color-tint: #f4f7ff;
+  --color-line: #e5eaf4;
+  --color-brand: #2f66f5;
+  --color-brand-2: #5a8bff;
+  --color-brand-ink: #1d47c4;
+  --color-brand-soft: #eaf0ff;
+  --color-amber: #f5a524;
+  --color-amber-soft: #fff4de;
   --color-amber-ink: #8a5a0a;
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -31,35 +36,59 @@ body {
 }
 
 ::selection {
-  background: var(--color-amber);
+  background: var(--color-brand-soft);
   color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-amber);
+  outline: 2px solid var(--color-brand);
   outline-offset: 3px;
   border-radius: 6px;
 }
 
-/* Trama de puntos de fondo del hero */
-.dots {
-  background-image: radial-gradient(circle, rgba(14, 39, 64, 0.2) 1.1px, transparent 1.3px);
-  background-size: 18px 18px;
-  -webkit-mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
-  mask-image: radial-gradient(ellipse at 100% 0%, #000 0%, transparent 70%);
+/* Fondo del hero: degradado suave con rejilla muy tenue */
+.hero-bg {
+  background:
+    radial-gradient(60rem 28rem at 50% -8rem, rgba(90, 139, 255, 0.22), transparent 70%),
+    radial-gradient(34rem 20rem at 92% 8rem, rgba(245, 165, 36, 0.14), transparent 70%),
+    radial-gradient(34rem 20rem at 6% 14rem, rgba(47, 102, 245, 0.10), transparent 70%),
+    linear-gradient(#ffffff, #f7f9ff);
+}
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(15, 27, 51, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 27, 51, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 68%);
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 68%);
 }
 
-/* La ruta del hero se dibuja al cargar */
-@keyframes draw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
+.gradient-text {
+  background: linear-gradient(90deg, #2f66f5 0%, #6a5cf0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
-.route-line {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-  animation: draw 1.6s ease-out both;
+
+/* Marco de navegador para los pantallazos */
+.frame {
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  box-shadow:
+    0 1px 2px rgba(15, 27, 51, 0.04),
+    0 24px 60px -18px rgba(15, 27, 51, 0.28),
+    0 8px 24px -12px rgba(47, 102, 245, 0.25);
+  overflow: hidden;
 }
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.floaty { animation: floaty 7s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .route-line { animation: none; }
+  .floaty { animation: none; }
   html { scroll-behavior: auto; }
 }

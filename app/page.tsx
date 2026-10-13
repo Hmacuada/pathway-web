@@ -3,45 +3,39 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "./_components/site-header";
 import { SiteFooter } from "./_components/site-footer";
+import { Shot } from "./_components/shot";
 import { EMAIL, SHOW_CLIENTS, WHATSAPP, demoLink, whatsappLink } from "./_components/site";
 
 // ── Contenido ────────────────────────────────────────────────────────────────
 // Solo se describe lo que hoy existe. Lo que está en desarrollo se dice como tal.
 
-const PRODUCTS = [
+type Tone = "brand" | "amber";
+
+const TONE: Record<Tone, { chip: string; check: string; link: string }> = {
+  brand: { chip: "bg-brand-soft text-brand-ink", check: "bg-brand-soft text-brand", link: "text-brand" },
+  amber: { chip: "bg-amber-soft text-amber-ink", check: "bg-amber-soft text-amber-ink", link: "text-amber-ink" },
+};
+
+const OVERVIEW = [
   {
-    key: "transporte",
+    id: "transporte",
     icon: Truck,
+    tone: "brand" as Tone,
     name: "Transporte",
     status: "Disponible",
-    statusTone: "bg-emerald-50 text-emerald-800 border-emerald-200",
-    tagline: "Back-office para operadores de transporte y 3PL: de cada viaje al pago del transportista, sin planillas.",
-    features: [
-      "Liquidación de conductores y de viajes especiales, con aprobación",
-      "Prefacturas por mandante y por período, con descarga en Excel",
-      "Flota y tripulación con control de documentos",
-      "Portal de solo lectura para que cada transportista vea sus viajes, prefacturas y liquidaciones",
-      "Chat con el transporte y cobros con contrato en línea, mensualidades y recibos",
-      "Resultados mensuales por transporte y comparador de órdenes de compra contra prefacturas",
-    ],
-    cta: "Solicitar demo de Transporte",
+    tagline: "Back-office para operadores de transporte y 3PL: de cada viaje al pago del transportista.",
+    points: ["Liquidación por guía, con aprobación", "Prefacturas por período y transportista", "Flota y documentos al día"],
+    shot: { name: "transporte-dashboard", alt: "Dashboard de Pathway Transporte con tasa de entrega, pipeline de rutas y resumen diario", label: "Pathway Transporte" },
   },
   {
-    key: "bodega",
+    id: "bodega",
     icon: Warehouse,
+    tone: "amber" as Tone,
     name: "Bodega",
     status: "Nuevo · en implementación",
-    statusTone: "bg-amber/15 text-amber-ink border-amber/50",
-    tagline: "Un solo stock confiable, con un portal para atender a tus distribuidores con plazos que se puedan cumplir.",
-    features: [
-      "Stock central con alertas de quiebre y de reposición",
-      "Portal mayorista: registro y aprobación de distribuidores, precios por volumen, cotizaciones y pedidos validados contra el stock",
-      "Recepción de compras y contenedores contra el packing list",
-      "Comparador de compras por barco o avión: costo, plazo y margen",
-      "Carga por Excel y conciliación con tu tienda web",
-      "Cuentas individuales para el personal, con permisos por rol",
-    ],
-    cta: "Solicitar demo de Bodega",
+    tagline: "Un solo stock confiable y un portal para atender a tus distribuidores con plazos que se puedan cumplir.",
+    points: ["Stock central con alertas de reposición", "Pedidos de todos tus canales", "Portal mayorista para distribuidores"],
+    shot: { name: "bodega-dashboard", alt: "Dashboard de Pathway Bodega con ventas, pedidos, quiebres y margen en riesgo", label: "Pathway Bodega" },
   },
 ] as const;
 
@@ -52,74 +46,72 @@ const STEPS = [
 ] as const;
 
 const NEXT_UP = [
-  { name: "RO", text: "Asistente de IA para consultar tu operación en lenguaje natural." },
-  { name: "Flow", text: "Planificación de rutas y despacho." },
-  { name: "Analytics", text: "Reportes y tendencias operativas." },
+  { name: "RO", tag: "En desarrollo", text: "Asistente de IA para consultar tu operación en lenguaje natural." },
+  { name: "Flow", tag: "Más adelante", text: "Planificación de rutas y despacho." },
+  { name: "Analytics", tag: "Más adelante", text: "Reportes y tendencias operativas." },
 ] as const;
 
-// ── Visual del hero: una sola ruta que va del viaje a la bodega ──────────────
-const NODES = [
-  { x: 110, y: 210, label: "Viajes", sub: "desde tu ruteo", group: "t" },
-  { x: 290, y: 90, label: "Prefacturas", sub: "por mandante", group: "t" },
-  { x: 470, y: 210, label: "Liquidación", sub: "de transportistas", group: "t" },
-  { x: 650, y: 90, label: "Stock", sub: "un solo inventario", group: "b" },
-  { x: 830, y: 210, label: "Pedidos", sub: "web y mayoristas", group: "b" },
-  { x: 1010, y: 90, label: "Recepción", sub: "de compras y contenedores", group: "b" },
-] as const;
+const TRANSPORTE_EXTRAS = [
+  "Dashboard operacional", "Resultados mensuales", "Chat con el transporte",
+  "Cobros con contrato en línea", "Comparador de órdenes de compra", "Importación desde Drivin",
+];
+const BODEGA_EXTRAS = [
+  "Recepción de compras y contenedores", "Comparador marítimo vs aéreo", "Carga por Excel",
+  "Conciliación con tu tienda web", "Cuentas por rol",
+];
 
-const ROUTE_D =
-  "M0 210 L110 210 C200 210 200 90 290 90 C380 90 380 210 470 210 C560 210 560 90 650 90 C740 90 740 210 830 210 C920 210 920 90 1010 90 L1100 90";
-
-function RouteVisual() {
+// ── Piezas ───────────────────────────────────────────────────────────────────
+function Eyebrow({ children, tone = "brand" }: { children: React.ReactNode; tone?: Tone }) {
   return (
-    <>
-      {/* Escritorio: la ruta completa */}
-      <svg
-        viewBox="0 0 1100 340"
-        className="hidden h-auto w-full md:block"
-        role="img"
-        aria-label="Una sola ruta conecta los viajes, las prefacturas y la liquidación de transportistas con el stock, los pedidos y la recepción de bodega."
-      >
-        <path d={ROUTE_D} pathLength={1} className="route-line" fill="none" stroke="#0e2740" strokeWidth="3" strokeLinecap="round" />
-        {NODES.map((n) => {
-          const upper = n.y < 150;
-          const ty = upper ? n.y - 40 : n.y + 36;
-          return (
-            <g key={n.label}>
-              <circle cx={n.x} cy={n.y} r="11" fill={n.group === "b" ? "#e3a035" : "#fbf9f4"} stroke="#0e2740" strokeWidth="3" />
-              <text x={n.x} y={ty} textAnchor="middle" fontSize="19" fontWeight="800" fill="#0e2740">{n.label}</text>
-              <text x={n.x} y={ty + 19} textAnchor="middle" fontSize="13.5" fill="#566478">{n.sub}</text>
-            </g>
-          );
-        })}
-        {/* Llaves de producto */}
-        <g fontSize="12.5" fontWeight="800" letterSpacing="2.4" textAnchor="middle">
-          <path d="M60 306 H520" stroke="#0e2740" strokeWidth="2" strokeLinecap="round" />
-          <text x="290" y="330" fill="#0e2740">PATHWAY TRANSPORTE</text>
-          <path d="M600 306 H1060" stroke="#e3a035" strokeWidth="2" strokeLinecap="round" />
-          <text x="830" y="330" fill="#8a5a0a">PATHWAY BODEGA</text>
-        </g>
-      </svg>
+    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.16em] ${TONE[tone].chip}`}>
+      {children}
+    </span>
+  );
+}
 
-      {/* Móvil: la misma idea en dos columnas */}
-      <div className="grid grid-cols-2 gap-5 md:hidden">
-        {(["t", "b"] as const).map((g) => (
-          <div key={g} className={`border-l-[3px] pl-4 ${g === "t" ? "border-ink" : "border-amber"}`}>
-            <p className={`mb-3 text-[11px] font-extrabold tracking-[0.18em] ${g === "t" ? "text-ink" : "text-amber-ink"}`}>
-              {g === "t" ? "PATHWAY TRANSPORTE" : "PATHWAY BODEGA"}
-            </p>
-            <ol className="space-y-3">
-              {NODES.filter((n) => n.group === g).map((n) => (
-                <li key={n.label}>
-                  <p className="text-sm font-extrabold leading-tight">{n.label}</p>
-                  <p className="text-xs text-muted">{n.sub}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ))}
+function Feature({
+  title, text, bullets, shot, tone = "brand", reverse = false,
+}: {
+  title: string;
+  text: string;
+  bullets: readonly string[];
+  shot: { name: string; alt: string; label: string };
+  tone?: Tone;
+  reverse?: boolean;
+}) {
+  return (
+    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className={reverse ? "lg:order-2" : ""}>
+        <h3 className="text-balance text-2xl font-extrabold leading-tight tracking-tight md:text-[1.9rem]">{title}</h3>
+        <p className="mt-4 text-[17px] leading-relaxed text-muted">{text}</p>
+        <ul className="mt-6 space-y-3.5">
+          {bullets.map((b) => (
+            <li key={b} className="flex items-start gap-3 text-[15px] leading-snug text-ink-2">
+              <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${TONE[tone].check}`}>
+                <Check size={12} strokeWidth={3} />
+              </span>
+              {b}
+            </li>
+          ))}
+        </ul>
       </div>
-    </>
+      <div className={reverse ? "lg:order-1" : ""}>
+        <Shot {...shot} />
+      </div>
+    </div>
+  );
+}
+
+function Chips({ items, tone }: { items: readonly string[]; tone: Tone }) {
+  return (
+    <div className="mt-14 border-t border-line pt-8">
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">También incluye</p>
+      <ul className="mt-4 flex flex-wrap gap-2.5">
+        {items.map((i) => (
+          <li key={i} className={`rounded-full px-4 py-2 text-sm font-semibold ${TONE[tone].chip}`}>{i}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -131,140 +123,275 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div className="dots pointer-events-none absolute right-0 top-0 h-[420px] w-[560px]" aria-hidden="true" />
-          <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-16 md:pb-20 md:pt-24">
-            <div className="mb-6 h-1 w-12 rounded-full bg-amber" aria-hidden="true" />
-            <p className="mb-5 text-xs font-extrabold uppercase tracking-[0.22em] text-ink-2">
-              Software logístico hecho en Chile
-            </p>
-            <h1 className="max-w-4xl text-balance text-[2.6rem] font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl md:text-[4.1rem]">
-              Tu operación logística, ordenada <span className="text-ink-2">de la ruta a la bodega.</span>
+        <section className="hero-bg relative overflow-hidden">
+          <div className="hero-grid pointer-events-none absolute inset-0" aria-hidden="true" />
+          <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-14 text-center md:pb-28 md:pt-20">
+            <a
+              href="#bodega"
+              className="mx-auto inline-flex items-center gap-2 rounded-full border border-line bg-white/90 py-1.5 pl-2 pr-4 text-sm font-semibold text-ink-2 shadow-sm hover:border-brand-2"
+            >
+              <span className="rounded-full bg-amber px-2.5 py-0.5 text-xs font-extrabold text-ink">Nuevo</span>
+              Pathway Bodega: un solo stock para tu tienda y tus distribuidores
+              <ArrowRight size={14} className="text-brand" />
+            </a>
+
+            <h1 className="mx-auto mt-7 max-w-4xl text-balance text-[2.6rem] font-extrabold leading-[1.04] tracking-tight sm:text-6xl md:text-[4.25rem]">
+              Tu operación logística, ordenada <span className="gradient-text">de la ruta a la bodega.</span>
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
+            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
               Pathway reúne en un solo lugar la liquidación de transportistas y el control de inventario.
               Menos planillas, menos cuadraturas a mano y datos en los que puedes confiar.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <a
                 href="#contacto"
-                className="inline-flex items-center gap-2 rounded-xl bg-ink px-6 py-3.5 text-sm font-bold text-white shadow-[0_8px_24px_rgba(14,39,64,0.25)] hover:bg-ink-2"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3.5 text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(47,102,245,0.75)] hover:bg-brand-ink"
               >
                 Solicitar demo <ArrowRight size={16} />
               </a>
               <a
                 href="#productos"
-                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-6 py-3.5 text-sm font-bold text-ink hover:border-ink-2"
+                className="inline-flex items-center gap-2 rounded-xl border border-line bg-white px-6 py-3.5 text-sm font-bold text-ink hover:border-brand-2"
               >
                 Ver los productos <ArrowDown size={16} />
               </a>
             </div>
+            <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-semibold text-muted">
+              {["Hecho en Chile", "Implementación acompañada", "Para transporte y distribución"].map((t) => (
+                <li key={t} className="inline-flex items-center gap-1.5">
+                  <Check size={14} strokeWidth={3} className="text-brand" /> {t}
+                </li>
+              ))}
+            </ul>
 
-            <div className="mt-14 md:mt-16">
-              <RouteVisual />
+            <div className="relative mx-auto mt-14 max-w-5xl text-left md:mt-16 md:pb-10">
+              <Shot
+                name="transporte-dashboard"
+                alt="Dashboard de Pathway Transporte con tasa de entrega, pipeline de rutas y resumen diario"
+                label="Pathway Transporte · Dashboard"
+                priority
+                sizes="(min-width: 1024px) 1024px, 94vw"
+              />
+              <Shot
+                name="bodega-portal"
+                alt="Portal mayorista de Pathway Bodega con catálogo, precios por volumen y disponibilidad"
+                label="Pathway Bodega · Portal mayorista"
+                sizes="(min-width: 1024px) 480px, 0px"
+                className="floaty absolute -bottom-2 -right-6 hidden w-[46%] md:block"
+              />
             </div>
           </div>
         </section>
 
         {/* Productos */}
-        <section id="productos" className="border-y border-line bg-white/60">
-          <div className="mx-auto max-w-6xl px-6 py-20">
-            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-2">Productos</p>
-            <h2 className="mt-3 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">
+        <section id="productos" className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <Eyebrow>Productos</Eyebrow>
+            <h2 className="mt-4 text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
               Dos productos que se pueden usar por separado o juntos.
             </h2>
-            <div className="mt-12 grid gap-6 lg:grid-cols-2">
-              {PRODUCTS.map((p) => (
-                <article key={p.key} id={p.key} className="flex flex-col rounded-2xl border border-line bg-paper p-7 md:p-8">
+          </div>
+          <div className="mt-14 grid gap-6 lg:grid-cols-2">
+            {OVERVIEW.map((p) => (
+              <article key={p.id} className="group flex flex-col overflow-hidden rounded-3xl border border-line bg-white shadow-[0_1px_2px_rgba(15,27,51,0.04),0_20px_50px_-30px_rgba(15,27,51,0.35)]">
+                <div className={`px-6 pt-6 ${p.tone === "brand" ? "bg-brand-soft/60" : "bg-amber-soft/70"}`}>
+                  <Shot {...p.shot} className="translate-y-px rounded-b-none border-b-0 shadow-none" sizes="(min-width: 1024px) 540px, 90vw" />
+                </div>
+                <div className="flex flex-1 flex-col p-7">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-ink text-white">
-                      <p.icon size={22} strokeWidth={1.8} />
+                    <span className="flex items-center gap-3">
+                      <span className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${p.tone === "brand" ? "bg-brand text-white" : "bg-amber text-ink"}`}>
+                        <p.icon size={21} strokeWidth={1.8} />
+                      </span>
+                      <span>
+                        <span className="block text-xs font-extrabold uppercase tracking-[0.18em] text-muted">Pathway</span>
+                        <span className="block text-2xl font-extrabold tracking-tight">{p.name}</span>
+                      </span>
                     </span>
-                    <span className={`rounded-full border px-3 py-1 text-xs font-bold ${p.statusTone}`}>{p.status}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${p.tone === "brand" ? "bg-emerald-50 text-emerald-800" : "bg-amber-soft text-amber-ink"}`}>
+                      {p.status}
+                    </span>
                   </div>
-                  <p className="mt-6 text-xs font-extrabold uppercase tracking-[0.2em] text-muted">Pathway</p>
-                  <h3 className="text-3xl font-extrabold tracking-tight">{p.name}</h3>
-                  <p className="mt-3 text-base leading-relaxed text-muted">{p.tagline}</p>
-                  <ul className="mt-6 space-y-3.5">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-3 text-[15px] leading-snug text-ink-2">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber/25">
-                          <Check size={12} strokeWidth={3} className="text-amber-ink" />
+                  <p className="mt-4 text-base leading-relaxed text-muted">{p.tagline}</p>
+                  <ul className="mt-5 space-y-2.5">
+                    {p.points.map((pt) => (
+                      <li key={pt} className="flex items-center gap-3 text-[15px] text-ink-2">
+                        <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${TONE[p.tone].check}`}>
+                          <Check size={12} strokeWidth={3} />
                         </span>
-                        {f}
+                        {pt}
                       </li>
                     ))}
                   </ul>
-                  <a
-                    href={demoLink(p.name)}
-                    className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-ink px-5 py-3 text-sm font-bold text-white hover:bg-ink-2"
-                  >
-                    {p.cta} <ArrowRight size={15} />
+                  <a href={`#${p.id}`} className={`mt-7 inline-flex w-fit items-center gap-2 text-sm font-extrabold ${TONE[p.tone].link} hover:underline`}>
+                    Ver cómo funciona Pathway {p.name} <ArrowRight size={15} />
                   </a>
-                </article>
-              ))}
-            </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
         {/* Quiénes lo usan: se activa en site.ts cuando haya clientes que lo autoricen */}
         {SHOW_CLIENTS && (
-          <section className="mx-auto max-w-6xl px-6 py-20">
-            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-2">Quiénes lo usan</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight md:text-4xl">
-              Operaciones que ya trabajan con Pathway.
-            </h2>
-            <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {/* Reemplazar por logos reales (public/clientes/…) */}
+          <section className="border-y border-line bg-tint">
+            <div className="mx-auto max-w-6xl px-6 py-14 text-center">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted">Operaciones que ya trabajan con Pathway</p>
+              <div className="mt-8 grid grid-cols-2 items-center gap-6 md:grid-cols-4">
+                {/* Reemplazar por logos reales (public/clientes/…) */}
+              </div>
             </div>
           </section>
         )}
 
+        {/* Transporte */}
+        <section id="transporte" className="border-y border-line bg-tint">
+          <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+            <div className="max-w-3xl">
+              <Eyebrow>Pathway Transporte</Eyebrow>
+              <h2 className="mt-4 text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
+                De cada viaje al pago del transportista, sin planillas.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-muted">
+                Para operadores de transporte y 3PL que liquidan, prefacturan y controlan su flota en hojas de cálculo.
+              </p>
+            </div>
+            <div className="mt-16 space-y-24">
+              <Feature
+                title="Liquidación por guía, con aprobación."
+                text="Cada hoja de ruta se liquida con las tarifas de tu plan: valor por guía, rechazos, recargos y adicionales. Revisas el detalle antes de confirmar."
+                bullets={[
+                  "Planes de pago por cliente (mandante)",
+                  "Viajes especiales con aprobación",
+                  "Descarga en Excel e impresión de cada documento",
+                ]}
+                shot={{ name: "transporte-liquidacion", alt: "Detalle de liquidación de una hoja de ruta con valor por guía y total a pagar", label: "Pathway Transporte · Liquidación" }}
+              />
+              <Feature
+                reverse
+                title="Prefacturas por período y transportista."
+                text="Agrupa las rutas liquidadas de cada transportista y emite la prefactura con neto, IVA y total. Todo queda en un historial que puedes consultar, imprimir o descargar."
+                bullets={[
+                  "Quincenas o el período que necesites",
+                  "Historial de prefacturas emitidas",
+                  "Portal de solo lectura para que cada transportista vea sus viajes, prefacturas y liquidaciones",
+                ]}
+                shot={{ name: "transporte-prefacturas", alt: "Historial de prefacturas emitidas por transportista con neto, IVA y total", label: "Pathway Transporte · Prefacturas" }}
+              />
+              <Feature
+                title="Flota y documentos al día."
+                text="Vehículos, personal y documentos con fecha de vencimiento: revisión técnica, permiso de circulación, SOAP y licencias, con aviso de lo que vence pronto."
+                bullets={[
+                  "Documentos por vehículo y por conductor",
+                  "Alertas de vencimientos próximos",
+                  "Kilómetros por patente y por mes",
+                ]}
+                shot={{ name: "transporte-flota", alt: "Gestión de flota con documentos y fechas de vencimiento", label: "Pathway Transporte · Flota" }}
+              />
+            </div>
+            <Chips items={TRANSPORTE_EXTRAS} tone="brand" />
+          </div>
+        </section>
+
+        {/* Bodega */}
+        <section id="bodega">
+          <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+            <div className="max-w-3xl">
+              <Eyebrow tone="amber">Pathway Bodega · Nuevo</Eyebrow>
+              <h2 className="mt-4 text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
+                Un solo stock confiable, y un portal para tus distribuidores.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-muted">
+                Para distribuidoras e importadores que hoy cuadran el inventario en planillas: un stock central que alimenta tus pedidos, tu tienda web y el portal mayorista.
+              </p>
+            </div>
+            <div className="mt-16 space-y-24">
+              <Feature
+                tone="amber"
+                title="Stock central, siempre a la vista."
+                text="Sabes qué está en quiebre, qué está bajo el punto de reposición y qué viene en camino, antes de que te falte."
+                bullets={[
+                  "Alertas de quiebre y de reposición, con clasificación ABC",
+                  "Lo que viene en camino y cuándo llega",
+                  "Crea la compra del faltante desde la misma pantalla",
+                ]}
+                shot={{ name: "bodega-stock", alt: "Stock crítico con estado, disponible, en camino y punto de reposición", label: "Pathway Bodega · Stock" }}
+              />
+              <Feature
+                reverse
+                tone="amber"
+                title="Pedidos de todos tus canales."
+                text="Mayorista, web y ventas directas en una sola lista, validados contra el stock antes de despachar."
+                bullets={[
+                  "Cotizaciones de distribuidores y demanda cotizada frente al stock",
+                  "Alerta con faltantes cuando un pedido no se puede cumplir",
+                  "Estado de cada pedido hasta el despacho",
+                ]}
+                shot={{ name: "bodega-pedidos", alt: "Lista de pedidos por canal con cliente, fecha, total y estado", label: "Pathway Bodega · Pedidos" }}
+              />
+              <Feature
+                tone="amber"
+                title="Un portal exclusivo para tus distribuidores."
+                text="Tus distribuidores se registran, ven su catálogo con precios por volumen y la disponibilidad real, y cotizan o piden sin llamarte."
+                bullets={[
+                  "Registro y aprobación de distribuidores",
+                  "Precios por volumen y descuento propio por cliente",
+                  "Disponibilidad y fecha de llegada de cada producto",
+                ]}
+                shot={{ name: "bodega-portal", alt: "Portal mayorista con catálogo, descuentos por volumen y disponibilidad", label: "Pathway Bodega · Portal mayorista" }}
+              />
+            </div>
+            <Chips items={BODEGA_EXTRAS} tone="amber" />
+          </div>
+        </section>
+
+        {/* Quiénes lo usan (marcador): el bloque real va arriba cuando SHOW_CLIENTS sea true */}
+
         {/* Cómo trabajamos */}
-        <section id="como-trabajamos" className="mx-auto max-w-6xl px-6 py-20">
-          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-2">Cómo trabajamos</p>
-          <h2 className="mt-3 max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">
-            No entregamos solo un sistema: lo dejamos funcionando con tu equipo.
-          </h2>
-          <ol className="mt-12 grid gap-8 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <li key={s.n} className="relative border-t-2 border-ink pt-6">
-                <span className="absolute -top-[13px] left-0 flex h-6 w-6 items-center justify-center rounded-full bg-amber text-xs font-extrabold text-ink">
-                  {s.n}
-                </span>
-                <h3 className="text-xl font-extrabold">{s.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.text}</p>
-              </li>
-            ))}
-          </ol>
+        <section id="como-trabajamos" className="border-y border-line bg-tint">
+          <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+            <div className="mx-auto max-w-3xl text-center">
+              <Eyebrow>Cómo trabajamos</Eyebrow>
+              <h2 className="mt-4 text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">
+                No entregamos solo un sistema: lo dejamos funcionando con tu equipo.
+              </h2>
+            </div>
+            <ol className="mt-14 grid gap-6 md:grid-cols-3">
+              {STEPS.map((s) => (
+                <li key={s.n} className="rounded-3xl border border-line bg-white p-7 shadow-[0_1px_2px_rgba(15,27,51,0.04),0_20px_50px_-34px_rgba(15,27,51,0.35)]">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-lg font-extrabold text-white">{s.n}</span>
+                  <h3 className="mt-5 text-xl font-extrabold">{s.title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
         {/* Lo que viene */}
-        <section className="bg-ink text-white">
-          <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1fr_1.4fr]">
+        <section className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:items-center">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-amber">Lo que viene</p>
-              <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">
+              <Eyebrow>Lo que viene</Eyebrow>
+              <h2 className="mt-4 text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">
                 Estamos construyendo más.
               </h2>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-white/70">
-                Lo que sigue está en desarrollo y todavía no está disponible. Si alguna de estas piezas te interesa, cuéntanos y la priorizamos.
+              <p className="mt-4 max-w-md text-lg leading-relaxed text-muted">
+                Lo que sigue está en desarrollo y todavía no está disponible. Si alguna pieza te interesa, cuéntanos y la priorizamos.
               </p>
             </div>
-            <ul className="space-y-4">
+            <ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
               {NEXT_UP.map((n) => (
-                <li key={n.name} className="flex items-start gap-4 rounded-2xl border border-white/15 bg-white/[0.04] p-5">
-                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                    {n.name === "RO" ? <Bot size={18} className="text-amber" /> : <span className="text-sm font-extrabold text-amber">{n.name[0]}</span>}
+                <li key={n.name} className="flex items-start gap-4 rounded-2xl border border-line bg-white p-5 shadow-[0_1px_2px_rgba(15,27,51,0.04)]">
+                  <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+                    {n.name === "RO" ? <Bot size={20} /> : <span className="text-base font-extrabold">{n.name[0]}</span>}
                   </span>
                   <div>
-                    <p className="flex items-center gap-3 text-lg font-extrabold">
+                    <p className="flex flex-wrap items-center gap-2 text-lg font-extrabold">
                       {n.name}
-                      <span className="rounded-full border border-white/25 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-white/70">
-                        {n.name === "RO" ? "En desarrollo" : "Más adelante"}
-                      </span>
+                      <span className="rounded-full border border-line bg-tint px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-muted">{n.tag}</span>
                     </p>
-                    <p className="mt-1 text-[15px] leading-relaxed text-white/70">{n.text}</p>
+                    <p className="mt-1 text-[15px] leading-relaxed text-muted">{n.text}</p>
                   </div>
                 </li>
               ))}
@@ -273,30 +400,33 @@ export default function Home() {
         </section>
 
         {/* Contacto */}
-        <section id="contacto" className="mx-auto max-w-6xl px-6 py-24">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-ink-2">Contacto</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight md:text-4xl">Hablemos de tu operación</h2>
-            <p className="mt-4 text-lg leading-relaxed text-muted">
-              Cuéntanos cómo operas y te mostramos cómo se vería en Pathway. Respondemos en un día hábil.
-            </p>
-            <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
-              <a
-                href={demoLink("Transporte o Bodega")}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-6 py-3.5 text-sm font-bold text-white shadow-[0_8px_24px_rgba(14,39,64,0.25)] hover:bg-ink-2"
-              >
-                <Mail size={16} /> {EMAIL}
-              </a>
-              {WHATSAPP && (
+        <section id="contacto" className="px-6 pb-24">
+          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand to-brand-2 px-6 py-16 text-center text-white md:px-12 md:py-20">
+            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+            <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
+            <div className="relative mx-auto max-w-2xl">
+              <h2 className="text-balance text-3xl font-extrabold leading-tight tracking-tight md:text-5xl">Hablemos de tu operación</h2>
+              <p className="mt-4 text-lg leading-relaxed text-white/85">
+                Cuéntanos cómo operas y te mostramos cómo se vería en Pathway. Respondemos en un día hábil.
+              </p>
+              <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
                 <a
-                  href={whatsappLink()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-6 py-3.5 text-sm font-bold text-ink hover:border-ink-2"
+                  href={demoLink("Transporte o Bodega")}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-brand-ink shadow-[0_12px_28px_-10px_rgba(15,27,51,0.5)] hover:bg-brand-soft"
                 >
-                  <MessageCircle size={16} /> WhatsApp
+                  <Mail size={16} /> {EMAIL}
                 </a>
-              )}
+                {WHATSAPP && (
+                  <a
+                    href={whatsappLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/60 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10"
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </section>

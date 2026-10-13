@@ -3,6 +3,11 @@
 export const EMAIL = "hola@pathway.cl";
 export const APP_URL = "https://app.pathway.cl";
 
+// Dirección de ingreso de Pathway Bodega. Hoy cada empresa tiene la suya (es una instalación
+// por cliente), así que queda vacía. Si más adelante hay una dirección común, ponerla acá
+// y el menú "Ingresar" mostrará el enlace directo.
+export const BODEGA_URL: string = "";
+
 // Número real en formato internacional sin "+" ni espacios (ej. "56912345678").
 // Mientras esté vacío, el botón de WhatsApp no se muestra.
 export const WHATSAPP = "56966474551";

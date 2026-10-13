@@ -17,7 +17,7 @@ export default function TerminosPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-            style={{ background: "#0e2740" }}>
+            style={{ background: "#2f66f5" }}>
             <FileText size={22} color="white" strokeWidth={1.8} />
           </div>
           <div>
