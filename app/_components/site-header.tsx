@@ -49,7 +49,7 @@ export function SiteHeader() {
                   </span>
                   <span>
                     <span className="block text-sm font-extrabold">Pathway Bodega</span>
-                    <span className="block text-xs text-muted">{BODEGA_URL.replace(/^https?:\/\//, "")}</span>
+                    <span className="block break-all text-xs text-muted">{BODEGA_URL.replace(/^https?:\/\//, "")}</span>
                   </span>
                 </a>
               ) : (
