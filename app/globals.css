@@ -1,20 +1,94 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+
+/* Paleta clara: fondo blanco, azul de marca y ámbar para Bodega */
+@theme inline {
+  --color-ink: #0f1b33;
+  --color-ink-2: #3c4a66;
+  --color-muted: #5b6b86;
+  --color-paper: #ffffff;
+  --color-tint: #f4f7ff;
+  --color-line: #e5eaf4;
+  --color-brand: #2f66f5;
+  --color-brand-2: #5a8bff;
+  --color-brand-ink: #1d47c4;
+  --color-brand-soft: #eaf0ff;
+  --color-amber: #f5a524;
+  --color-amber-soft: #fff4de;
+  --color-amber-ink: #8a5a0a;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-html { scroll-behavior: smooth; }
+::selection {
+  background: var(--color-brand-soft);
+  color: var(--color-ink);
+}
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Fondo del hero: degradado suave con rejilla muy tenue */
+.hero-bg {
+  background:
+    radial-gradient(60rem 28rem at 50% -8rem, rgba(90, 139, 255, 0.22), transparent 70%),
+    radial-gradient(34rem 20rem at 92% 8rem, rgba(245, 165, 36, 0.14), transparent 70%),
+    radial-gradient(34rem 20rem at 6% 14rem, rgba(47, 102, 245, 0.10), transparent 70%),
+    linear-gradient(#ffffff, #f7f9ff);
+}
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(15, 27, 51, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 27, 51, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 68%);
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 0%, transparent 68%);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #2f66f5 0%, #6a5cf0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Marco de navegador para los pantallazos */
+.frame {
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  box-shadow:
+    0 1px 2px rgba(15, 27, 51, 0.04),
+    0 24px 60px -18px rgba(15, 27, 51, 0.28),
+    0 8px 24px -12px rgba(47, 102, 245, 0.25);
+  overflow: hidden;
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.floaty { animation: floaty 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .floaty { animation: none; }
+  html { scroll-behavior: auto; }
+}
